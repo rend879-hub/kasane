@@ -6,6 +6,31 @@ let currentContent = null;
 let selectedTags   = [];
 let selectedColor  = null;
 let customOshiText = "";
+let selectedTemplate = "post";
+
+const SHARE_TEMPLATES = {
+  post: {
+    className: "share-card-preview--post",
+    filename: "kasane-card-post.png",
+    exportWidth: 1080,
+    tagLimit: 4,
+    fragmentLimit: 72
+  },
+  header: {
+    className: "share-card-preview--header",
+    filename: "kasane-card-header.png",
+    exportWidth: 1500,
+    tagLimit: 2,
+    fragmentLimit: 42
+  },
+  icon: {
+    className: "share-card-preview--icon",
+    filename: "kasane-card-icon.png",
+    exportWidth: 1024,
+    tagLimit: 1,
+    fragmentLimit: 24
+  }
+};
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -150,11 +175,36 @@ function getShareCardTags() {
   return oshiTag ? [...baseTags, oshiTag] : baseTags;
 }
 
+function getTemplateConfig() {
+  return SHARE_TEMPLATES[selectedTemplate] || SHARE_TEMPLATES.post;
+}
+
+function truncateText(text, limit) {
+  const normalized = (text || "").replace(/\s+/g, " ").trim();
+  if (normalized.length <= limit) return normalized;
+  return normalized.slice(0, limit).trim() + "…";
+}
+
+function setSelectedTemplate(template) {
+  if (!SHARE_TEMPLATES[template]) return;
+  selectedTemplate = template;
+
+  document.querySelectorAll(".template-option").forEach(btn => {
+    const active = btn.dataset.template === template;
+    btn.classList.toggle("template-option--active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  if (currentSection === "preview") renderPreview();
+}
+
 // ── Preview render ─────────────────────────────────────────────────────
 function renderPreview() {
   if (!currentContent) return;
   const container = document.getElementById("share-card-preview");
   container.innerHTML = "";
+  const template = getTemplateConfig();
+  container.className = "share-card-preview " + template.className;
 
   const color = selectedColor || currentContent.defaultColor;
   const oshiInput = document.getElementById("oshi-input");
@@ -200,7 +250,8 @@ function renderPreview() {
   } else {
     media = document.createElement("div");
     media.className = "share-card-fragment";
-    media.innerHTML = currentContent.fragment
+    const fragmentText = truncateText(currentContent.fragment, template.fragmentLimit);
+    media.innerHTML = fragmentText
       .split("\n")
       .map(line => `<span>${line}</span>`)
       .join("<br>");
@@ -231,7 +282,7 @@ function renderPreview() {
   // tags
   const tagsEl = document.createElement("div");
   tagsEl.className = "share-card-tags";
-  const tagsToShow = getShareCardTags();
+  const tagsToShow = getShareCardTags().slice(0, template.tagLimit);
   tagsToShow.forEach(tag => {
     const t = document.createElement("span");
     t.className = "share-card-tag";
@@ -359,9 +410,12 @@ function setCanvasFont(context, element) {
 
 function drawTextElement(context, element, baseRect) {
   const rect = getRelativeRect(element, baseRect);
+  const style = window.getComputedStyle(element);
+  if (style.display === "none" || style.visibility === "hidden" || rect.width <= 0 || rect.height <= 0) {
+    return;
+  }
   setCanvasFont(context, element);
 
-  const style = window.getComputedStyle(element);
   const fontSize = parseFloat(style.fontSize) || 16;
   const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
   const text = element.textContent || "";
@@ -392,6 +446,7 @@ function drawTextElement(context, element, baseRect) {
 
 function drawImageElement(context, image, baseRect) {
   const rect = getRelativeRect(image, baseRect);
+  if (rect.width <= 0 || rect.height <= 0) return;
   const style = window.getComputedStyle(image);
   const radius = parseFloat(style.borderRadius) || 0;
 
@@ -499,15 +554,17 @@ async function savePreviewImage() {
   const card = document.getElementById("share-card-preview");
   const saveButton = document.getElementById("btn-save-image");
   if (!card || !card.children.length) return;
+  const template = getTemplateConfig();
 
   const originalText = saveButton.textContent;
   saveButton.disabled = true;
   saveButton.textContent = "保存準備中";
 
   try {
-    const scale = 2;
-    const filename = "kasane-card.png";
     await waitForPreviewImages(card);
+    const cardWidth = Math.ceil(card.getBoundingClientRect().width) || 1;
+    const scale = Math.max(2, template.exportWidth / cardWidth);
+    const filename = template.filename;
     const canvas = drawPreviewToCanvas(card, scale);
     const blob = await canvasToBlob(canvas);
     const shared = await shareImageFile(blob, filename);
@@ -592,6 +649,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // type tabs
   document.querySelectorAll(".type-tab").forEach(btn => {
     btn.addEventListener("click", () => setFilter(btn.dataset.type));
+  });
+
+  document.querySelectorAll(".template-option").forEach(btn => {
+    btn.addEventListener("click", () => setSelectedTemplate(btn.dataset.template));
   });
 
   // nav logo → generator
