@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KASANE — 感性のアーカイブ</title>
+  <meta name="description" content="古典、絵画、詩の断片に、自分だけの意味を重ねていく。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <header class="site-header">
+    <nav class="nav">
+      <button class="nav-logo-btn" aria-label="ホームへ戻る">KASANE</button>
+      <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
+    </nav>
+  </header>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="page-wrap">
+
+    <!-- ─── GENERATOR ─── -->
+    <section id="section-generator" class="section section-generator section--active" aria-label="カード生成">
+
+      <div class="date-line" id="date-label" aria-live="polite">今日の断片</div>
+
+      <!-- Type tabs -->
+      <div class="type-tabs" role="group" aria-label="種別">
+        <button class="type-tab type-tab--active" data-type="all"     aria-pressed="true">すべて</button>
+        <button class="type-tab"                  data-type="classic" aria-pressed="false">古典</button>
+        <button class="type-tab"                  data-type="painting" aria-pressed="false">絵画</button>
+        <button class="type-tab"                  data-type="poem"    aria-pressed="false">詩</button>
+      </div>
+
+      <!-- Fragment card -->
+      <article class="fragment-card" aria-label="文化断片">
+        <span class="badge" id="fragment-badge">古典</span>
+
+        <div class="fragment-text" id="fragment-text" lang="ja">
+          <!-- populated by JS -->
+        </div>
+
+        <div class="fragment-meta">
+          <span class="fragment-title"  id="fragment-title"></span>
+          <span class="fragment-author" id="fragment-author"></span>
+        </div>
+
+        <p class="fragment-comment" id="fragment-comment"></p>
+
+        <div class="color-pill">
+          <span class="color-dot" id="color-dot" aria-hidden="true"></span>
+          <span class="color-name" id="color-name"></span>
+        </div>
+      </article>
+
+      <!-- Kasane controls -->
+      <div class="kasane-controls" aria-label="カード設定">
+
+        <div class="control-block">
+          <label class="control-label" for="oshi-input">誰かの気配を重ねる</label>
+          <p class="control-help">名前を出さなくても大丈夫です。空欄のままでもカードにできます。</p>
+          <input id="oshi-input" class="oshi-input" type="text"
+            placeholder="例：青い人、夜明けみたいな人、ふと思い出した誰か"
+            autocomplete="off" maxlength="60">
+        </div>
+
+        <div class="control-block">
+          <p class="control-label" id="tag-label">タグを重ねる</p>
+          <div id="tag-options" class="tag-options" role="group" aria-labelledby="tag-label"></div>
+        </div>
+
+        <div class="control-block">
+          <p class="control-label" id="color-label">色を添える</p>
+          <div id="color-options" class="color-options" role="group" aria-labelledby="color-label"></div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn btn--ghost"   id="btn-next">別の断片を見る</button>
+        <button class="btn btn--primary" id="btn-preview">カードを確認する</button>
+      </div>
+
+    </section>
+
+    <!-- ─── PREVIEW ─── -->
+    <section id="section-preview" class="section section-preview" aria-label="カードプレビュー">
+
+      <p class="preview-header">カードプレビュー</p>
+
+      <div class="share-card-preview" id="share-card-preview" aria-label="シェアカードプレビュー"></div>
+
+      <div class="preview-actions">
+        <button class="btn btn--ghost" id="btn-back">編集に戻る</button>
+      </div>
+
+    </section>
+
+    <!-- ─── ABOUT ─── -->
+    <section id="section-about" class="section section-about" aria-label="このプロダクトについて">
+
+      <p class="about-logo">KASANE</p>
+      <div class="about-rule" aria-hidden="true"></div>
+
+      <div class="about-body">
+        <p>KASANE は、好きの気配を文化の中に見つけるための小さなノートです。</p>
+        <p>古典、絵画、詩に、自分だけの意味を重ねていく。<br>
+           名前を出さなくてもいい。<br>
+           正しく説明できなくてもいい。</p>
+        <p>感じた断片に、タグや色や気配を重ねて、<br>
+           一枚のカードとして残すことができます。</p>
+      </div>
+
+      <p class="about-note">
+        推し活は、最高の教養である。<br>
+        推しを入口にして、古典・絵画・詩・色・言葉・文化へ興味を広げていく。<br>
+        KASANEは、その静かな旅のための道具です。
+      </p>
+
+      <div class="about-actions">
+        <button class="btn btn--ghost nav-logo-btn">断片を見る</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer class="site-footer">
+    <button class="footer-link nav-about-btn">このプロダクトについて</button>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="contents.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
