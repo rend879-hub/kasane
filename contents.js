@@ -266,5 +266,15 @@ const KASANE_COLORS = [
   { name: "瑠璃色", basic: "青",     hex: "#1E50A2" },
   { name: "浅葱色", basic: "青緑",   hex: "#00A3AF" },
   { name: "藤色",  basic: "紫",     hex: "#BBBCDE" },
-  { name: "青磁",  basic: "青緑",   hex: "#A8C8B9" }
+  { name: "青磁",  basic: "青緑",   hex: "#A8C8B9" },
+  { name: "紅色",  basic: "赤",     hex: "#C22047" },
+  { name: "朱色",  basic: "赤橙",   hex: "#EB6101" },
+  { name: "山吹色", basic: "黄",     hex: "#F8B500" },
+  { name: "若草色", basic: "緑",     hex: "#C3D825" },
+  { name: "常磐色", basic: "緑",     hex: "#007B43" },
+  { name: "空色",  basic: "水色",   hex: "#A0D8EF" },
+  { name: "藍色",  basic: "青",     hex: "#165E83" },
+  { name: "菫色",  basic: "紫",     hex: "#7058A3" },
+  { name: "葡萄色", basic: "紫",     hex: "#522F60" },
+  { name: "煤竹色", basic: "茶",     hex: "#5D5245" }
 ];
