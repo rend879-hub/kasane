@@ -61,6 +61,103 @@ function hasPaintingImage(content) {
   return content.type === "painting" && Boolean(content.imagePath);
 }
 
+function getLearnFallbackIntro(content) {
+  const type = typeLabel(content.type);
+  const period = content.period ? content.period + "に位置づけられる" : "";
+  return "『" + content.title + "』は、" + period + type + "として親しまれている作品です。作者は" + content.author + "。この断片には、作品全体の気配が小さく残っています。";
+}
+
+function getLearnFallbackPoint(content) {
+  return content.shortComment || "言葉や色の奥に、少しだけ立ち止まりたくなる余韻があります。";
+}
+
+function getSourceLabel(content, learn) {
+  if (learn && learn.sourceLabel) return learn.sourceLabel;
+  if (content.type === "painting") return "画像の出典を見る";
+  if (content.source === "青空文庫") return "青空文庫で読む";
+  return content.source ? content.source + "で見る" : "出典を見る";
+}
+
+function createLearnItem(label, text, modifier) {
+  if (!text) return null;
+
+  const item = document.createElement("div");
+  item.className = "learn-item" + (modifier ? " learn-item--" + modifier : "");
+
+  const term = document.createElement("dt");
+  term.className = "learn-term";
+  term.textContent = label;
+
+  const description = document.createElement("dd");
+  description.className = "learn-description";
+  description.textContent = text;
+
+  item.appendChild(term);
+  item.appendChild(description);
+  return item;
+}
+
+function renderLearnPanel(containerId, content) {
+  const container = document.getElementById(containerId);
+  if (!container || !content) return;
+
+  const learn = content.learn || {};
+  const intro = learn.intro || getLearnFallbackIntro(content);
+  const point = learn.point || getLearnFallbackPoint(content);
+  const tips = learn.tips || "";
+  const sourceLabel = getSourceLabel(content, learn);
+
+  container.innerHTML = "";
+
+  const details = document.createElement("details");
+  details.className = "learn-details";
+
+  const summary = document.createElement("summary");
+  summary.className = "learn-summary";
+
+  const summaryText = document.createElement("span");
+  summaryText.className = "learn-summary-text";
+  summaryText.textContent = "この断片をひらく";
+
+  const summaryHint = document.createElement("span");
+  summaryHint.className = "learn-summary-hint";
+  summaryHint.textContent = "作品の背景を、少しだけ読む";
+
+  summary.appendChild(summaryText);
+  summary.appendChild(summaryHint);
+
+  const body = document.createElement("div");
+  body.className = "learn-body";
+
+  const list = document.createElement("dl");
+  list.className = "learn-list";
+
+  [createLearnItem("これは何？", intro), createLearnItem("どこが面白い？", point), createLearnItem("Tips", tips, "tips")]
+    .filter(Boolean)
+    .forEach(item => list.appendChild(item));
+
+  body.appendChild(list);
+
+  if (content.sourceUrl) {
+    const source = document.createElement("a");
+    source.className = "learn-source-link";
+    source.href = content.sourceUrl;
+    source.target = "_blank";
+    source.rel = "noopener noreferrer";
+    source.textContent = sourceLabel;
+    body.appendChild(source);
+  }
+
+  details.appendChild(summary);
+  details.appendChild(body);
+  container.appendChild(details);
+}
+
+function renderLearnPanels(content) {
+  renderLearnPanel("learn-panel-generator", content);
+  renderLearnPanel("learn-panel-preview", content);
+}
+
 // ── Render fragment card ───────────────────────────────────────────────
 function renderFragment(content) {
   const badge     = document.getElementById("fragment-badge");
@@ -591,6 +688,7 @@ function showContent(content, resetOshi) {
   if (resetOshi) customOshiText = "";
 
   renderFragment(content);
+  renderLearnPanels(content);
   renderTagOptions(content.tags);
   renderColorOptions();
 }

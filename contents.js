@@ -12,6 +12,12 @@ const KASANE_CONTENTS = [
     sourceUrl: "https://www.aozora.gr.jp/cards/000196/files/975_15935.html",
     licenseNote: "青空文庫掲載のパブリックドメイン本文。",
     period: "鎌倉時代",
+    learn: {
+      intro: "『方丈記』は、鎌倉時代の随筆です。災害や世の移り変わりを見つめながら、小さな住まいで生きる感覚まで静かに書き残しています。",
+      point: "冒頭の一文は、変わらないように見えるものほど、実は少しずつ変わっていることを思い出させます。きれいなのに、少しだけ胸が冷える断片です。",
+      tips: "題名の「方丈」は、約三メートル四方ほどの小さな庵のこと。この人、スケールの大きい無常を語りながら、暮らしのサイズ感はかなりミニマルです。",
+      sourceLabel: "青空文庫で読む"
+    },
     themeGroup: "旅・無常・余白",
     shareText: "ゆく河の流れは絶えずして。静かな無常に、誰かの気配を重ねる。",
     imagePath: ""
@@ -1066,6 +1072,12 @@ const KASANE_CONTENTS = [
     sourceUrl: "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
     licenseNote: "Wikimedia Commons上のPublic Domain画像。",
     period: "1889年",
+    learn: {
+      intro: "『星月夜』は、ファン・ゴッホが南フランスのサン＝レミで描いた油彩画です。夜空の渦と村の静けさが、現実と心象のあいだにある風景のように見えます。",
+      point: "星は明るいのに、画面全体にはひとりで夜を見ているような切実さがあります。青の美しさと落ち着かなさが、同時に残るところが魅力です。",
+      tips: "ゴッホは弟テオへの手紙で、絵のことを何度も相談していました。孤高の画家というより、作品のそばにずっと話を聞いてほしい相手がいた人にも見えてきます。",
+      sourceLabel: "画像の出典を見る"
+    },
     themeGroup: "青・夜・月",
     shareText: "渦巻く夜空に、祈りのような誰かを重ねる。",
     imagePath: "assets/images/painting_003_vangogh_starry_night.jpg"
