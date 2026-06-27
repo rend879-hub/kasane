@@ -395,7 +395,16 @@ body {
 }
 
 .preview-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
   margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 /* ═══════════════════════════════════════════════════
