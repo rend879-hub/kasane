@@ -227,6 +227,146 @@ function renderPreview() {
   container.appendChild(inner);
 }
 
+// ── Save preview as image ──────────────────────────────────────────────
+function createImageDownload(url, filename) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function getRelativeRect(element, baseRect) {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: rect.left - baseRect.left,
+    y: rect.top - baseRect.top,
+    width: rect.width,
+    height: rect.height
+  };
+}
+
+function drawRoundedRect(context, x, y, width, height, radius) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+}
+
+function setCanvasFont(context, element) {
+  const style = window.getComputedStyle(element);
+  context.font = [
+    style.fontStyle,
+    style.fontWeight,
+    style.fontSize,
+    style.fontFamily
+  ].join(" ");
+  context.fillStyle = style.color;
+  context.textBaseline = "top";
+  if ("letterSpacing" in context) {
+    context.letterSpacing = style.letterSpacing;
+  }
+}
+
+function drawTextElement(context, element, baseRect) {
+  const rect = getRelativeRect(element, baseRect);
+  setCanvasFont(context, element);
+  context.fillText(element.textContent, rect.x, rect.y);
+}
+
+function drawPreviewToCanvas(card, scale) {
+  const baseRect = card.getBoundingClientRect();
+  const width = Math.ceil(baseRect.width);
+  const height = Math.ceil(baseRect.height);
+  const cardStyle = window.getComputedStyle(card);
+  const canvas = document.createElement("canvas");
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+
+  const context = canvas.getContext("2d");
+  context.scale(scale, scale);
+
+  const radius = parseFloat(cardStyle.borderRadius) || 0;
+  context.shadowColor = "rgba(0,0,0,0.07)";
+  context.shadowBlur = 20;
+  context.shadowOffsetY = 4;
+  drawRoundedRect(context, 0, 0, width, height, radius);
+  context.fillStyle = cardStyle.backgroundColor;
+  context.fill();
+
+  context.shadowColor = "transparent";
+  context.lineWidth = 1;
+  context.strokeStyle = cardStyle.borderColor;
+  drawRoundedRect(context, 0.5, 0.5, width - 1, height - 1, radius);
+  context.stroke();
+
+  const stripe = card.querySelector(".share-card-stripe");
+  if (stripe) {
+    const stripeRect = getRelativeRect(stripe, baseRect);
+    context.fillStyle = window.getComputedStyle(stripe).backgroundColor;
+    context.fillRect(stripeRect.x, stripeRect.y, stripeRect.width, stripeRect.height);
+  }
+
+  const rule = card.querySelector(".share-card-rule");
+  if (rule) {
+    const ruleRect = getRelativeRect(rule, baseRect);
+    context.fillStyle = window.getComputedStyle(rule).backgroundColor;
+    context.fillRect(ruleRect.x, ruleRect.y, ruleRect.width, ruleRect.height);
+  }
+
+  const dot = card.querySelector(".share-card-color-dot");
+  if (dot) {
+    const dotRect = getRelativeRect(dot, baseRect);
+    const dotStyle = window.getComputedStyle(dot);
+    context.beginPath();
+    context.arc(dotRect.x + dotRect.width / 2, dotRect.y + dotRect.height / 2, dotRect.width / 2, 0, Math.PI * 2);
+    context.fillStyle = dotStyle.backgroundColor;
+    context.fill();
+    context.strokeStyle = dotStyle.borderColor;
+    context.lineWidth = 1;
+    context.stroke();
+  }
+
+  card.querySelectorAll(
+    ".share-card-logo, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-oshi"
+  ).forEach(element => {
+    drawTextElement(context, element, baseRect);
+  });
+
+  return canvas;
+}
+
+function savePreviewImage() {
+  const card = document.getElementById("share-card-preview");
+  const saveButton = document.getElementById("btn-save-image");
+  if (!card || !card.children.length) return;
+
+  const originalText = saveButton.textContent;
+  saveButton.disabled = true;
+  saveButton.textContent = "保存中";
+
+  try {
+    const scale = 2;
+    const canvas = drawPreviewToCanvas(card, scale);
+    const pngUrl = canvas.toDataURL("image/png");
+    createImageDownload(pngUrl, "kasane-card.png");
+  } catch (error) {
+    console.error(error);
+    window.alert("画像として保存できませんでした。別のブラウザでお試しください。");
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = originalText;
+  }
+}
+
 // ── Show content ───────────────────────────────────────────────────────
 function showContent(content, resetOshi) {
   currentContent = content;
@@ -321,4 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
+
+  // "画像として保存" → download preview card
+  document.getElementById("btn-save-image").addEventListener("click", savePreviewImage);
 });
