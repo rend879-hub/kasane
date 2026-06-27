@@ -311,6 +311,45 @@ function drawTextElement(context, element, baseRect) {
   context.fillText(element.textContent, rect.x, rect.y);
 }
 
+function drawImageElement(context, image, baseRect) {
+  const rect = getRelativeRect(image, baseRect);
+  const style = window.getComputedStyle(image);
+  const radius = parseFloat(style.borderRadius) || 0;
+
+  drawRoundedRect(context, rect.x, rect.y, rect.width, rect.height, radius);
+  context.fillStyle = style.backgroundColor;
+  context.fill();
+  context.save();
+  context.clip();
+
+  const naturalWidth = image.naturalWidth || rect.width;
+  const naturalHeight = image.naturalHeight || rect.height;
+  const imageScale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+  const drawWidth = naturalWidth * imageScale;
+  const drawHeight = naturalHeight * imageScale;
+  const drawX = rect.x + (rect.width - drawWidth) / 2;
+  const drawY = rect.y + (rect.height - drawHeight) / 2;
+  context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+  context.restore();
+
+  context.strokeStyle = style.borderColor;
+  context.lineWidth = parseFloat(style.borderWidth) || 1;
+  drawRoundedRect(context, rect.x + 0.5, rect.y + 0.5, rect.width - 1, rect.height - 1, radius);
+  context.stroke();
+}
+
+function waitForPreviewImages(card) {
+  const images = [...card.querySelectorAll("img")];
+  return Promise.all(images.map(image => {
+    if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+    if (image.decode) return image.decode().catch(() => undefined);
+    return new Promise(resolve => {
+      image.addEventListener("load", resolve, { once: true });
+      image.addEventListener("error", resolve, { once: true });
+    });
+  }));
+}
+
 function drawPreviewToCanvas(card, scale) {
   const baseRect = card.getBoundingClientRect();
   const width = Math.ceil(baseRect.width);
@@ -364,6 +403,10 @@ function drawPreviewToCanvas(card, scale) {
     context.stroke();
   }
 
+  card.querySelectorAll(".share-card-image").forEach(image => {
+    drawImageElement(context, image, baseRect);
+  });
+
   card.querySelectorAll(
     ".share-card-logo, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-oshi"
   ).forEach(element => {
@@ -373,7 +416,7 @@ function drawPreviewToCanvas(card, scale) {
   return canvas;
 }
 
-function savePreviewImage() {
+async function savePreviewImage() {
   const card = document.getElementById("share-card-preview");
   const saveButton = document.getElementById("btn-save-image");
   if (!card || !card.children.length) return;
@@ -384,6 +427,7 @@ function savePreviewImage() {
 
   try {
     const scale = 2;
+    await waitForPreviewImages(card);
     const canvas = drawPreviewToCanvas(card, scale);
     const pngUrl = canvas.toDataURL("image/png");
     createImageDownload(pngUrl, "kasane-card.png");
