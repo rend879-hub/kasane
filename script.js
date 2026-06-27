@@ -32,9 +32,15 @@ function typeBadgeClass(type) {
   return map[type] || "";
 }
 
+function hasPaintingImage(content) {
+  return content.type === "painting" && Boolean(content.imagePath);
+}
+
 // ── Render fragment card ───────────────────────────────────────────────
 function renderFragment(content) {
   const badge     = document.getElementById("fragment-badge");
+  const imageWrap = document.getElementById("fragment-image-wrap");
+  const imageEl   = document.getElementById("fragment-image");
   const fragmentEl = document.getElementById("fragment-text");
   const titleEl   = document.getElementById("fragment-title");
   const authorEl  = document.getElementById("fragment-author");
@@ -43,10 +49,22 @@ function renderFragment(content) {
   badge.textContent = typeLabel(content.type);
   badge.className   = "badge " + typeBadgeClass(content.type);
 
-  fragmentEl.innerHTML = content.fragment
-    .split("\n")
-    .map(line => `<span>${line}</span>`)
-    .join("<br>");
+  if (hasPaintingImage(content)) {
+    imageEl.src = content.imagePath;
+    imageEl.alt = "『" + content.title + "』";
+    imageWrap.hidden = false;
+    fragmentEl.hidden = true;
+    fragmentEl.innerHTML = "";
+  } else {
+    imageEl.removeAttribute("src");
+    imageEl.alt = "";
+    imageWrap.hidden = true;
+    fragmentEl.hidden = false;
+    fragmentEl.innerHTML = content.fragment
+      .split("\n")
+      .map(line => `<span>${line}</span>`)
+      .join("<br>");
+  }
 
   titleEl.textContent  = "『" + content.title + "』";
   authorEl.textContent = content.author;
@@ -153,12 +171,23 @@ function renderPreview() {
   type.textContent = typeLabel(currentContent.type);
 
   // fragment
-  const frag = document.createElement("div");
-  frag.className = "share-card-fragment";
-  frag.innerHTML = currentContent.fragment
-    .split("\n")
-    .map(line => `<span>${line}</span>`)
-    .join("<br>");
+  let media;
+  if (hasPaintingImage(currentContent)) {
+    media = document.createElement("figure");
+    media.className = "share-card-image-wrap";
+    const img = document.createElement("img");
+    img.className = "share-card-image";
+    img.src = currentContent.imagePath;
+    img.alt = "『" + currentContent.title + "』";
+    media.appendChild(img);
+  } else {
+    media = document.createElement("div");
+    media.className = "share-card-fragment";
+    media.innerHTML = currentContent.fragment
+      .split("\n")
+      .map(line => `<span>${line}</span>`)
+      .join("<br>");
+  }
 
   // rule
   const rule = document.createElement("div");
@@ -216,7 +245,7 @@ function renderPreview() {
 
   inner.appendChild(logo);
   inner.appendChild(type);
-  inner.appendChild(frag);
+  inner.appendChild(media);
   inner.appendChild(rule);
   inner.appendChild(meta);
   inner.appendChild(tagsEl);
