@@ -143,6 +143,13 @@ function updateOshiText(value) {
   customOshiText = value.trim();
 }
 
+function getShareCardTags() {
+  if (!currentContent) return [];
+  const baseTags = selectedTags.length > 0 ? selectedTags : currentContent.tags;
+  const oshiTag = customOshiText ? customOshiText + "っぽい" : null;
+  return oshiTag ? [...baseTags, oshiTag] : baseTags;
+}
+
 // ── Preview render ─────────────────────────────────────────────────────
 function renderPreview() {
   if (!currentContent) return;
@@ -224,7 +231,7 @@ function renderPreview() {
   // tags
   const tagsEl = document.createElement("div");
   tagsEl.className = "share-card-tags";
-  const tagsToShow = selectedTags.length > 0 ? selectedTags : currentContent.tags;
+  const tagsToShow = getShareCardTags();
   tagsToShow.forEach(tag => {
     const t = document.createElement("span");
     t.className = "share-card-tag";
@@ -249,15 +256,6 @@ function renderPreview() {
   colorRow.appendChild(cName);
   colorRow.appendChild(cHex);
 
-  // oshi
-  const oshi = document.createElement("p");
-  oshi.className = "share-card-oshi";
-  if (oshiText) {
-    oshi.textContent = oshiText + "の気配を、ここに重ねる。";
-  } else {
-    oshi.textContent = "誰かの気配を、ここに重ねる。";
-  }
-
   inner.appendChild(brand);
   inner.appendChild(type);
   inner.appendChild(media);
@@ -266,7 +264,6 @@ function renderPreview() {
   inner.appendChild(comment);
   inner.appendChild(tagsEl);
   inner.appendChild(colorRow);
-  inner.appendChild(oshi);
 
   container.appendChild(stripe);
   container.appendChild(inner);
@@ -451,7 +448,7 @@ function drawPreviewToCanvas(card, scale) {
   });
 
   card.querySelectorAll(
-    ".share-card-logo, .share-card-subtitle, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-comment, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-oshi"
+    ".share-card-logo, .share-card-subtitle, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-comment, .share-card-tag, .share-card-color-name, .share-card-color-hex"
   ).forEach(element => {
     drawTextElement(context, element, baseRect);
   });
