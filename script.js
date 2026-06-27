@@ -150,6 +150,9 @@ function renderPreview() {
   container.innerHTML = "";
 
   const color = selectedColor || currentContent.defaultColor;
+  const oshiInput = document.getElementById("oshi-input");
+  const oshiText = oshiInput ? oshiInput.value.trim() : customOshiText;
+  customOshiText = oshiText;
 
   // stripe
   const stripe = document.createElement("div");
@@ -160,10 +163,17 @@ function renderPreview() {
   const inner = document.createElement("div");
   inner.className = "share-card-inner";
 
-  // logo
+  // brand
+  const brand = document.createElement("div");
+  brand.className = "share-card-brand";
   const logo = document.createElement("span");
   logo.className = "share-card-logo";
   logo.textContent = "KASANE";
+  const subtitle = document.createElement("span");
+  subtitle.className = "share-card-subtitle";
+  subtitle.textContent = "好きの断片帳";
+  brand.appendChild(logo);
+  brand.appendChild(subtitle);
 
   // type
   const type = document.createElement("p");
@@ -206,6 +216,11 @@ function renderPreview() {
   meta.appendChild(titleEl);
   meta.appendChild(authorEl);
 
+  // comment
+  const comment = document.createElement("p");
+  comment.className = "share-card-comment";
+  comment.textContent = currentContent.shortComment;
+
   // tags
   const tagsEl = document.createElement("div");
   tagsEl.className = "share-card-tags";
@@ -237,17 +252,18 @@ function renderPreview() {
   // oshi
   const oshi = document.createElement("p");
   oshi.className = "share-card-oshi";
-  if (customOshiText) {
-    oshi.textContent = customOshiText + "の気配を重ねる";
+  if (oshiText) {
+    oshi.textContent = oshiText + "の気配を、ここに重ねる。";
   } else {
     oshi.textContent = "誰かの気配を、ここに重ねる。";
   }
 
-  inner.appendChild(logo);
+  inner.appendChild(brand);
   inner.appendChild(type);
   inner.appendChild(media);
   inner.appendChild(rule);
   inner.appendChild(meta);
+  inner.appendChild(comment);
   inner.appendChild(tagsEl);
   inner.appendChild(colorRow);
   inner.appendChild(oshi);
@@ -308,7 +324,34 @@ function setCanvasFont(context, element) {
 function drawTextElement(context, element, baseRect) {
   const rect = getRelativeRect(element, baseRect);
   setCanvasFont(context, element);
-  context.fillText(element.textContent, rect.x, rect.y);
+
+  const style = window.getComputedStyle(element);
+  const fontSize = parseFloat(style.fontSize) || 16;
+  const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
+  const text = element.textContent || "";
+  const shouldWrap = rect.height > lineHeight * 1.4 && text.length > 0;
+
+  if (!shouldWrap) {
+    context.fillText(text, rect.x, rect.y);
+    return;
+  }
+
+  const lines = [];
+  let line = "";
+  [...text].forEach(char => {
+    const nextLine = line + char;
+    if (line && context.measureText(nextLine).width > rect.width) {
+      lines.push(line);
+      line = char.trimStart();
+    } else {
+      line = nextLine;
+    }
+  });
+  if (line) lines.push(line);
+
+  lines.forEach((lineText, index) => {
+    context.fillText(lineText, rect.x, rect.y + lineHeight * index);
+  });
 }
 
 function drawImageElement(context, image, baseRect) {
@@ -408,7 +451,7 @@ function drawPreviewToCanvas(card, scale) {
   });
 
   card.querySelectorAll(
-    ".share-card-logo, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-oshi"
+    ".share-card-logo, .share-card-subtitle, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-comment, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-oshi"
   ).forEach(element => {
     drawTextElement(context, element, baseRect);
   });
