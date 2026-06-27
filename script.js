@@ -279,6 +279,45 @@ function createImageDownload(url, filename) {
   link.remove();
 }
 
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Canvasを画像化できませんでした。"));
+      }
+    }, "image/png");
+  });
+}
+
+async function shareImageFile(blob, filename) {
+  if (!navigator.share || !navigator.canShare || !window.File) {
+    return false;
+  }
+
+  const file = new File([blob], filename, { type: "image/png" });
+
+  if (!navigator.canShare({ files: [file] })) {
+    return false;
+  }
+
+  try {
+    await navigator.share({
+      files: [file],
+      title: "KASANE",
+      text: "KASANEでカードを作りました。"
+    });
+    return true;
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function getRelativeRect(element, baseRect) {
   const rect = element.getBoundingClientRect();
   return {
@@ -463,17 +502,24 @@ async function savePreviewImage() {
 
   const originalText = saveButton.textContent;
   saveButton.disabled = true;
-  saveButton.textContent = "保存中";
+  saveButton.textContent = "保存準備中";
 
   try {
     const scale = 2;
+    const filename = "kasane-card.png";
     await waitForPreviewImages(card);
     const canvas = drawPreviewToCanvas(card, scale);
-    const pngUrl = canvas.toDataURL("image/png");
-    createImageDownload(pngUrl, "kasane-card.png");
+    const blob = await canvasToBlob(canvas);
+    const shared = await shareImageFile(blob, filename);
+
+    if (!shared) {
+      const pngUrl = URL.createObjectURL(blob);
+      createImageDownload(pngUrl, filename);
+      setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+    }
   } catch (error) {
     console.error(error);
-    window.alert("画像として保存できませんでした。別のブラウザでお試しください。");
+    window.alert("画像を保存・共有できませんでした。別のブラウザでお試しください。");
   } finally {
     saveButton.disabled = false;
     saveButton.textContent = originalText;
@@ -575,6 +621,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
 
-  // "画像として保存" → download preview card
+  // "画像を保存・共有" → share or download preview card
   document.getElementById("btn-save-image").addEventListener("click", savePreviewImage);
 });

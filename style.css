@@ -404,6 +404,17 @@ body {
   flex-wrap: wrap;
 }
 
+.save-help {
+  margin-top: 12px;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: var(--ink-light);
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
 .btn:disabled {
   cursor: wait;
   opacity: 0.6;
