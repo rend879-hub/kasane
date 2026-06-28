@@ -20,15 +20,15 @@ const SHARE_TEMPLATES = {
     className: "share-card-preview--header",
     filename: "kasane-card-header.png",
     exportWidth: 1500,
-    tagLimit: 2,
-    fragmentLimit: 42
+    tagLimit: 1,
+    fragmentLimit: 30
   },
   icon: {
     className: "share-card-preview--icon",
     filename: "kasane-card-icon.png",
     exportWidth: 1024,
     tagLimit: 1,
-    fragmentLimit: 24
+    fragmentLimit: 16
   }
 };
 
@@ -293,6 +293,11 @@ function setSelectedTemplate(template) {
   });
 
   if (currentSection === "preview") renderPreview();
+}
+
+function openPreview() {
+  renderPreview();
+  showSection("preview");
 }
 
 // ── Preview render ─────────────────────────────────────────────────────
@@ -772,10 +777,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // "カードを確認する" → render preview then show
-  document.getElementById("btn-preview").addEventListener("click", () => {
-    renderPreview();
-    showSection("preview");
-  });
+  document.getElementById("btn-preview").addEventListener("click", openPreview);
+  document.getElementById("btn-preview-top").addEventListener("click", openPreview);
 
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
