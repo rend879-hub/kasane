@@ -16,6 +16,12 @@
   --accent:       #8C7B6B;
   --accent-soft:  #D4C9BC;
   --accent-current: #FDEFF2;
+  --button-bg: #8C7B6B;
+  --button-bg-hover: #7D6D5E;
+  --button-text: #FDFCF9;
+  --chip-active-bg: #EFE8DD;
+  --chip-active-border: #CDBEAD;
+  --chip-active-text: #2A2622;
 
   --serif:  'Noto Serif JP', 'Georgia', serif;
   --sans:   'Noto Sans JP', system-ui, sans-serif;
@@ -528,14 +534,14 @@ body {
 }
 
 .btn--primary {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-bg);
 }
 
 .btn--primary:hover {
-  background: #3D3730;
-  border-color: #3D3730;
+  background: var(--button-bg-hover);
+  border-color: var(--button-bg-hover);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -890,15 +896,16 @@ body {
 }
 
 .tag-chip--active {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
   font-weight: 400;
 }
 
 .tag-chip--active:hover {
-  background: #3D3730;
-  border-color: #3D3730;
+  background: #E7DED2;
+  border-color: #BFAF9E;
+  color: var(--chip-active-text);
 }
 
 /* ── Color chips ── */
@@ -933,10 +940,10 @@ body {
 }
 
 .color-chip--active {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
   font-weight: 400;
-  background: rgba(0,0,0,0.03);
+  background: var(--chip-active-bg);
 }
 
 .color-swatch {
@@ -945,6 +952,74 @@ body {
   border-radius: 50%;
   border: 1px solid rgba(0,0,0,0.12);
   flex-shrink: 0;
+}
+
+/* ── Symbol chips ── */
+.symbol-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.symbol-chip {
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--ink-mid);
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1;
+  padding: 0 10px;
+  transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.symbol-chip:hover {
+  border-color: var(--accent-soft);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.symbol-chip--active {
+  background: var(--chip-active-bg);
+  border-color: var(--chip-active-border);
+  color: var(--chip-active-text);
+}
+
+.control-label--sub {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--ink-light);
+}
+
+.custom-symbol-input {
+  width: 100%;
+  max-width: 220px;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--ink);
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  outline: none;
+  letter-spacing: 0.04em;
+  transition: border-color var(--transition);
+  -webkit-appearance: none;
+}
+
+.custom-symbol-input::placeholder {
+  color: var(--ink-light);
+  font-weight: 300;
+}
+
+.custom-symbol-input:focus {
+  border-color: var(--accent-soft);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1331,6 +1406,39 @@ body {
   display: none;
 }
 
+.share-card-symbol {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  z-index: 1;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.share-card-preview--post .share-card-symbol {
+  right: 34px;
+  bottom: 30px;
+  font-size: 1.55rem;
+}
+
+.share-card-preview--header .share-card-symbol {
+  right: 20px;
+  bottom: 16px;
+  font-size: 1.05rem;
+  opacity: 0.36;
+}
+
+.share-card-preview--icon .share-card-symbol {
+  right: 26px;
+  bottom: 24px;
+  font-size: 1.35rem;
+  opacity: 0.38;
+}
+
 @media (max-width: 480px) {
   .template-selector {
     width: 100%;
@@ -1436,6 +1544,21 @@ body {
   }
   .share-card-preview--icon .share-card-brand {
     margin-top: 10px;
+  }
+  .share-card-preview--post .share-card-symbol {
+    right: 22px;
+    bottom: 24px;
+    font-size: 1.25rem;
+  }
+  .share-card-preview--header .share-card-symbol {
+    right: 12px;
+    bottom: 10px;
+    font-size: 0.82rem;
+  }
+  .share-card-preview--icon .share-card-symbol {
+    right: 20px;
+    bottom: 18px;
+    font-size: 1.1rem;
   }
   .share-card-fragment {
     font-size: 1.2rem;

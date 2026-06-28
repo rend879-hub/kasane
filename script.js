@@ -7,6 +7,8 @@ let selectedTags   = [];
 let selectedColor  = null;
 let customOshiText = "";
 let selectedTemplate = "post";
+let selectedSymbol = "";
+let customSymbolText = "";
 
 const SHARE_TEMPLATES = {
   post: {
@@ -31,6 +33,45 @@ const SHARE_TEMPLATES = {
     fragmentLimit: 16
   }
 };
+
+const KASANE_SYMBOLS = [
+  { label: "なし", value: "" },
+  { label: "✦", value: "✦" },
+  { label: "✧", value: "✧" },
+  { label: "✩", value: "✩" },
+  { label: "★", value: "★" },
+  { label: "☆", value: "☆" },
+  { label: "⟡", value: "⟡" },
+  { label: "⊹", value: "⊹" },
+  { label: "❖", value: "❖" },
+  { label: "◆", value: "◆" },
+  { label: "◇", value: "◇" },
+  { label: "◈", value: "◈" },
+  { label: "●", value: "●" },
+  { label: "○", value: "○" },
+  { label: "◎", value: "◎" },
+  { label: "◌", value: "◌" },
+  { label: "◍", value: "◍" },
+  { label: "◐", value: "◐" },
+  { label: "◑", value: "◑" },
+  { label: "☾", value: "☾" },
+  { label: "☽", value: "☽" },
+  { label: "☀︎", value: "☀︎" },
+  { label: "☁︎", value: "☁︎" },
+  { label: "♡", value: "♡" },
+  { label: "♥︎", value: "♥︎" },
+  { label: "✿", value: "✿" },
+  { label: "❀", value: "❀" },
+  { label: "❁", value: "❁" },
+  { label: "❊", value: "❊" },
+  { label: "❋", value: "❋" },
+  { label: "♪", value: "♪" },
+  { label: "♫", value: "♫" },
+  { label: "♬", value: "♬" },
+  { label: "∞", value: "∞" },
+  { label: "⌘", value: "⌘" },
+  { label: "⊿", value: "⊿" }
+];
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -258,6 +299,49 @@ function selectColor(color) {
   if (colorNameEl) colorNameEl.textContent = color.name;
   if (colorDotEl)  colorDotEl.style.background = color.hex;
   renderColorOptions();
+
+  if (currentSection === "preview") renderPreview();
+}
+
+// ── Symbol options ─────────────────────────────────────────────────────
+function renderSymbolOptions() {
+  const container = document.getElementById("symbol-options");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  KASANE_SYMBOLS.forEach(symbol => {
+    const btn = document.createElement("button");
+    const isActive = selectedSymbol === symbol.value;
+
+    btn.type = "button";
+    btn.className = "symbol-chip" + (isActive ? " symbol-chip--active" : "");
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    btn.textContent = symbol.label;
+    btn.addEventListener("click", () => selectSymbol(symbol.value));
+    container.appendChild(btn);
+  });
+}
+
+function selectSymbol(value) {
+  selectedSymbol = value;
+  renderSymbolOptions();
+
+  if (currentSection === "preview") renderPreview();
+}
+
+function normalizeCustomSymbol(value) {
+  return [...value.trim()].slice(0, 2).join("");
+}
+
+function updateCustomSymbol(value) {
+  customSymbolText = normalizeCustomSymbol(value);
+
+  if (currentSection === "preview") renderPreview();
+}
+
+function getSelectedDisplaySymbol() {
+  return customSymbolText || selectedSymbol || "";
 }
 
 // ── Oshi text ──────────────────────────────────────────────────────────
@@ -409,6 +493,16 @@ function renderPreview() {
   colorRow.appendChild(cName);
   colorRow.appendChild(cHex);
 
+  const displaySymbol = getSelectedDisplaySymbol();
+  let symbolEl = null;
+  if (displaySymbol) {
+    symbolEl = document.createElement("span");
+    symbolEl.className = "share-card-symbol";
+    symbolEl.textContent = displaySymbol;
+    symbolEl.style.color = color.hex;
+    symbolEl.setAttribute("aria-hidden", "true");
+  }
+
   inner.appendChild(brand);
   inner.appendChild(type);
   inner.appendChild(media);
@@ -417,6 +511,7 @@ function renderPreview() {
   inner.appendChild(comment);
   inner.appendChild(tagsEl);
   inner.appendChild(colorRow);
+  if (symbolEl) inner.appendChild(symbolEl);
 
   container.appendChild(stripe);
   container.appendChild(inner);
@@ -522,9 +617,13 @@ function drawTextElement(context, element, baseRect) {
   const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
   const text = element.textContent || "";
   const shouldWrap = rect.height > lineHeight * 1.4 && text.length > 0;
+  const opacity = parseFloat(style.opacity);
+  context.save();
+  context.globalAlpha = Number.isNaN(opacity) ? 1 : opacity;
 
   if (!shouldWrap) {
     context.fillText(text, rect.x, rect.y);
+    context.restore();
     return;
   }
 
@@ -544,6 +643,7 @@ function drawTextElement(context, element, baseRect) {
   lines.forEach((lineText, index) => {
     context.fillText(lineText, rect.x, rect.y + lineHeight * index);
   });
+  context.restore();
 }
 
 function drawImageElement(context, image, baseRect) {
@@ -644,7 +744,7 @@ function drawPreviewToCanvas(card, scale) {
   });
 
   card.querySelectorAll(
-    ".share-card-logo, .share-card-subtitle, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-comment, .share-card-tag, .share-card-color-name, .share-card-color-hex"
+    ".share-card-logo, .share-card-subtitle, .share-card-type, .share-card-fragment span, .share-card-title, .share-card-author, .share-card-comment, .share-card-tag, .share-card-color-name, .share-card-color-hex, .share-card-symbol"
   ).forEach(element => {
     drawTextElement(context, element, baseRect);
   });
@@ -696,6 +796,7 @@ function showContent(content, resetOshi) {
   renderLearnPanels(content);
   renderTagOptions(content.tags);
   renderColorOptions();
+  renderSymbolOptions();
 }
 
 // ── Initialize ─────────────────────────────────────────────────────────
@@ -776,7 +877,14 @@ document.addEventListener("DOMContentLoaded", () => {
     updateOshiText(e.target.value);
   });
 
-  // "カードを確認する" → render preview then show
+  const customSymbolInput = document.getElementById("custom-symbol-input");
+  if (customSymbolInput) {
+    customSymbolInput.addEventListener("input", e => {
+      updateCustomSymbol(e.target.value);
+    });
+  }
+
+  // "カードを生成する" → render preview then show
   document.getElementById("btn-preview").addEventListener("click", openPreview);
   document.getElementById("btn-preview-top").addEventListener("click", openPreview);
 

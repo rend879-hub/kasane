@@ -31,7 +31,7 @@
           <h1 class="generator-title" id="generator-title">今日の断片から、1枚のカードをつくる</h1>
           <p class="generator-copy">古典・絵画・詩に、好きの気配とタグ、伝統色を静かに重ねます。</p>
         </div>
-        <button class="btn btn--primary generator-preview-btn" id="btn-preview-top">カードを確認する</button>
+        <button class="btn btn--primary generator-preview-btn" id="btn-preview-top">カードを生成する</button>
       </div>
 
       <!-- Type tabs -->
@@ -90,12 +90,25 @@
           <div id="color-options" class="color-options" role="group" aria-labelledby="color-label"></div>
         </div>
 
+        <div class="control-block">
+          <p class="control-label" id="symbol-label">記号を添える</p>
+          <p class="control-help">選んだ色で、カードに小さな記号を添えます。空欄のままでも大丈夫です。</p>
+          <div id="symbol-options" class="symbol-options" role="group" aria-labelledby="symbol-label"></div>
+
+          <label class="control-label control-label--sub" for="custom-symbol-input">自分で入力する</label>
+          <p class="control-help">絵文字や記号を1〜2文字だけ入力できます。</p>
+          <input id="custom-symbol-input" class="custom-symbol-input" type="text"
+            placeholder="例：🌙 / 🩵 / 🫧"
+            maxlength="4"
+            autocomplete="off">
+        </div>
+
       </div>
 
       <!-- Actions -->
       <div class="actions">
         <button class="btn btn--ghost"   id="btn-next">別の断片を見る</button>
-        <button class="btn btn--primary" id="btn-preview">カードを確認する</button>
+        <button class="btn btn--primary" id="btn-preview">カードを生成する</button>
       </div>
 
     </section>
