@@ -379,6 +379,21 @@ body {
   animation: pulse-in 0.3s ease forwards;
 }
 
+@keyframes painting-float-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fragment-image-wrap--float-in {
+  animation: painting-float-in 420ms ease-out both;
+}
+
 /* ── Learn panel ── */
 .learn-panel {
   margin-top: 18px;
@@ -816,7 +831,11 @@ body {
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .fragment-card--pulse { animation: none; }
+  .fragment-card--pulse,
+  .fragment-image-wrap--float-in {
+    animation: none;
+  }
+
   * { transition-duration: 0ms !important; }
 }
 
