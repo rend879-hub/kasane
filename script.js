@@ -7,8 +7,8 @@ let selectedTags   = [];
 let selectedColor  = null;
 let customOshiText = "";
 let selectedTemplate = "post";
-let selectedSymbol = "";
 let customSymbolText = "";
+let customTagText = "";
 
 const SHARE_TEMPLATES = {
   post: {
@@ -33,45 +33,6 @@ const SHARE_TEMPLATES = {
     fragmentLimit: 16
   }
 };
-
-const KASANE_SYMBOLS = [
-  { label: "なし", value: "" },
-  { label: "✦", value: "✦" },
-  { label: "✧", value: "✧" },
-  { label: "✩", value: "✩" },
-  { label: "★", value: "★" },
-  { label: "☆", value: "☆" },
-  { label: "⟡", value: "⟡" },
-  { label: "⊹", value: "⊹" },
-  { label: "❖", value: "❖" },
-  { label: "◆", value: "◆" },
-  { label: "◇", value: "◇" },
-  { label: "◈", value: "◈" },
-  { label: "●", value: "●" },
-  { label: "○", value: "○" },
-  { label: "◎", value: "◎" },
-  { label: "◌", value: "◌" },
-  { label: "◍", value: "◍" },
-  { label: "◐", value: "◐" },
-  { label: "◑", value: "◑" },
-  { label: "☾", value: "☾" },
-  { label: "☽", value: "☽" },
-  { label: "☀︎", value: "☀︎" },
-  { label: "☁︎", value: "☁︎" },
-  { label: "♡", value: "♡" },
-  { label: "♥︎", value: "♥︎" },
-  { label: "✿", value: "✿" },
-  { label: "❀", value: "❀" },
-  { label: "❁", value: "❁" },
-  { label: "❊", value: "❊" },
-  { label: "❋", value: "❋" },
-  { label: "♪", value: "♪" },
-  { label: "♫", value: "♫" },
-  { label: "♬", value: "♬" },
-  { label: "∞", value: "∞" },
-  { label: "⌘", value: "⌘" },
-  { label: "⊿", value: "⊿" }
-];
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -303,33 +264,7 @@ function selectColor(color) {
   if (currentSection === "preview") renderPreview();
 }
 
-// ── Symbol options ─────────────────────────────────────────────────────
-function renderSymbolOptions() {
-  const container = document.getElementById("symbol-options");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  KASANE_SYMBOLS.forEach(symbol => {
-    const btn = document.createElement("button");
-    const isActive = selectedSymbol === symbol.value;
-
-    btn.type = "button";
-    btn.className = "symbol-chip" + (isActive ? " symbol-chip--active" : "");
-    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-    btn.textContent = symbol.label;
-    btn.addEventListener("click", () => selectSymbol(symbol.value));
-    container.appendChild(btn);
-  });
-}
-
-function selectSymbol(value) {
-  selectedSymbol = value;
-  renderSymbolOptions();
-
-  if (currentSection === "preview") renderPreview();
-}
-
+// ── Custom symbol ──────────────────────────────────────────────────────
 function normalizeCustomSymbol(value) {
   return [...value.trim()].slice(0, 2).join("");
 }
@@ -341,7 +276,21 @@ function updateCustomSymbol(value) {
 }
 
 function getSelectedDisplaySymbol() {
-  return customSymbolText || selectedSymbol || "";
+  return customSymbolText || "";
+}
+
+// ── Custom tag ─────────────────────────────────────────────────────────
+function normalizeCustomTag(value) {
+  return value
+    .trim()
+    .replace(/^#+/, "")
+    .replace(/\s+/g, "");
+}
+
+function updateCustomTag(value) {
+  customTagText = normalizeCustomTag(value);
+
+  if (currentSection === "preview") renderPreview();
 }
 
 // ── Oshi text ──────────────────────────────────────────────────────────
@@ -353,7 +302,12 @@ function getShareCardTags() {
   if (!currentContent) return [];
   const baseTags = selectedTags.length > 0 ? selectedTags : currentContent.tags;
   const oshiTag = customOshiText ? customOshiText + "っぽい" : null;
-  return oshiTag ? [...baseTags, oshiTag] : baseTags;
+  const customTag = customTagText ? customTagText : null;
+  return [
+    ...(customTag ? [customTag] : []),
+    ...baseTags,
+    ...(oshiTag ? [oshiTag] : [])
+  ];
 }
 
 function getTemplateConfig() {
@@ -492,6 +446,7 @@ function renderPreview() {
   colorRow.appendChild(dot);
   colorRow.appendChild(cName);
   colorRow.appendChild(cHex);
+  const shouldShowColorLabel = selectedTemplate === "post";
 
   const displaySymbol = getSelectedDisplaySymbol();
   let symbolEl = null;
@@ -510,7 +465,7 @@ function renderPreview() {
   inner.appendChild(meta);
   inner.appendChild(comment);
   inner.appendChild(tagsEl);
-  inner.appendChild(colorRow);
+  if (shouldShowColorLabel) inner.appendChild(colorRow);
   if (symbolEl) inner.appendChild(symbolEl);
 
   container.appendChild(stripe);
@@ -796,7 +751,6 @@ function showContent(content, resetOshi) {
   renderLearnPanels(content);
   renderTagOptions(content.tags);
   renderColorOptions();
-  renderSymbolOptions();
 }
 
 // ── Initialize ─────────────────────────────────────────────────────────
@@ -876,6 +830,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("oshi-input").addEventListener("input", e => {
     updateOshiText(e.target.value);
   });
+
+  const customTagInput = document.getElementById("custom-tag-input");
+  if (customTagInput) {
+    customTagInput.addEventListener("input", e => {
+      updateCustomTag(e.target.value);
+    });
+  }
 
   const customSymbolInput = document.getElementById("custom-symbol-input");
   if (customSymbolInput) {

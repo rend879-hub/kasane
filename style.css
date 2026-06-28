@@ -189,7 +189,7 @@ body {
 .type-tabs {
   display: flex;
   gap: 0;
-  margin-bottom: 34px;
+  margin-bottom: 14px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   overflow: hidden;
@@ -223,6 +223,19 @@ body {
 }
 
 .type-tab--active:hover { background: #ECE3D7; color: var(--ink); }
+
+.fragment-actions {
+  display: flex;
+  margin-bottom: 22px;
+}
+
+.fragment-actions--top {
+  justify-content: flex-start;
+}
+
+.fragment-actions .btn {
+  padding-inline: 18px;
+}
 
 /* Fragment card */
 .fragment-card {
@@ -954,41 +967,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Symbol chips ── */
-.symbol-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.symbol-chip {
-  min-width: 34px;
-  height: 34px;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  background: var(--bg-card);
-  color: var(--ink-mid);
-  cursor: pointer;
-  font-family: var(--serif);
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1;
-  padding: 0 10px;
-  transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
-}
-
-.symbol-chip:hover {
-  border-color: var(--accent-soft);
-  color: var(--ink);
-  transform: translateY(-1px);
-}
-
-.symbol-chip--active {
-  background: var(--chip-active-bg);
-  border-color: var(--chip-active-border);
-  color: var(--chip-active-text);
-}
-
 .control-label--sub {
   display: block;
   margin-top: 6px;
@@ -996,11 +974,11 @@ body {
   color: var(--ink-light);
 }
 
+.custom-tag-input,
 .custom-symbol-input {
   width: 100%;
-  max-width: 220px;
   font-family: var(--serif);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 300;
   color: var(--ink);
   background: var(--bg-card);
@@ -1013,11 +991,22 @@ body {
   -webkit-appearance: none;
 }
 
+.custom-tag-input {
+  max-width: 320px;
+}
+
+.custom-symbol-input {
+  max-width: 220px;
+  font-size: 0.95rem;
+}
+
+.custom-tag-input::placeholder,
 .custom-symbol-input::placeholder {
   color: var(--ink-light);
   font-weight: 300;
 }
 
+.custom-tag-input:focus,
 .custom-symbol-input:focus {
   border-color: var(--accent-soft);
 }
@@ -1357,6 +1346,7 @@ body {
 .share-card-preview--header .share-card-color {
   grid-area: color;
   margin-bottom: 0;
+  display: none;
 }
 
 .share-card-preview--icon .share-card-color {
@@ -1364,6 +1354,7 @@ body {
   flex-direction: column;
   gap: 9px;
   margin-bottom: 6px;
+  display: none;
 }
 
 .share-card-color-dot {
