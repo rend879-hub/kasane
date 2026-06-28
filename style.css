@@ -137,11 +137,53 @@ body {
   background: var(--rule);
 }
 
+.generator-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.generator-kicker {
+  font-family: var(--sans);
+  font-size: 0.64rem;
+  font-weight: 300;
+  color: var(--ink-light);
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+}
+
+.generator-title {
+  font-family: var(--serif);
+  font-size: 1.34rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.generator-copy {
+  max-width: 32em;
+  margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--ink-mid);
+  letter-spacing: 0.04em;
+}
+
+.generator-preview-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 /* Type tabs */
 .type-tabs {
   display: flex;
   gap: 0;
-  margin-bottom: 40px;
+  margin-bottom: 34px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   overflow: hidden;
@@ -672,6 +714,44 @@ body {
   .nav { padding: 0 16px; }
   .site-footer { padding: 20px 16px; }
 
+  .section-generator {
+    padding-top: 34px;
+  }
+
+  .date-line {
+    margin-bottom: 24px;
+  }
+
+  .generator-intro {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .generator-title {
+    font-size: 1.16rem;
+    line-height: 1.55;
+  }
+
+  .generator-copy {
+    font-size: 0.74rem;
+    line-height: 1.75;
+  }
+
+  .generator-preview-btn {
+    width: 100%;
+  }
+
+  .type-tabs {
+    width: 100%;
+  }
+
+  .type-tab {
+    flex: 1 1 0;
+    padding: 8px 0;
+  }
+
   .fragment-card {
     padding: 32px 24px 28px;
   }
@@ -873,9 +953,9 @@ body {
 
 .share-card-preview {
   background: var(--bg-card);
-  border: 1px solid var(--rule);
+  border: 1px solid rgba(214, 209, 201, 0.88);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 10px 34px rgba(42, 38, 34, 0.08), 0 1px 2px rgba(42, 38, 34, 0.05);
   overflow: hidden;
   position: relative;
   max-width: 480px;
@@ -889,18 +969,18 @@ body {
 .share-card-preview--header {
   width: min(100%, 620px);
   max-width: 620px;
-  aspect-ratio: 3 / 1;
+  aspect-ratio: 3.35 / 1;
 }
 
 .share-card-preview--icon {
-  width: min(100%, 420px);
-  max-width: 420px;
+  width: min(100%, 390px);
+  max-width: 390px;
   aspect-ratio: 1 / 1;
 }
 
 /* Color stripe top */
 .share-card-stripe {
-  height: 4px;
+  height: 3px;
   width: 100%;
   transition: background 0.4s ease;
 }
@@ -910,32 +990,31 @@ body {
 }
 
 .share-card-preview--post .share-card-inner {
-  padding: 48px 50px 52px;
+  padding: 50px 52px 54px;
 }
 
 .share-card-preview--header .share-card-inner {
-  height: calc(100% - 4px);
+  height: calc(100% - 3px);
   display: grid;
-  grid-template-columns: minmax(150px, 0.84fr) minmax(0, 1.16fr);
+  grid-template-columns: minmax(132px, 0.78fr) minmax(0, 1.22fr);
   grid-template-areas:
     "media type"
     "media meta"
-    "media comment"
     "media tags"
     "media color"
     "media brand";
-  column-gap: 34px;
+  column-gap: 38px;
   align-content: center;
-  padding: 30px 50px 28px;
+  padding: 26px 48px 24px;
 }
 
 .share-card-preview--icon .share-card-inner {
-  height: calc(100% - 4px);
+  height: calc(100% - 3px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 54px;
+  padding: 46px 42px 40px;
   text-align: center;
 }
 
@@ -945,7 +1024,7 @@ body {
 
 .share-card-preview--header .share-card-brand {
   grid-area: brand;
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -953,14 +1032,14 @@ body {
 
 .share-card-preview--icon .share-card-brand {
   order: 6;
-  margin: 18px 0 0;
+  margin: 16px 0 0;
 }
 
 .share-card-logo {
   font-family: var(--serif);
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   color: var(--ink-light);
   margin-bottom: 6px;
   display: block;
@@ -976,7 +1055,7 @@ body {
 }
 
 .share-card-preview--icon .share-card-logo {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   color: var(--ink-mid);
 }
 
@@ -1002,7 +1081,9 @@ body {
 
 .share-card-preview--header .share-card-type {
   grid-area: type;
-  margin: 0 0 10px;
+  margin: 0 0 9px;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
 }
 
 .share-card-preview--icon .share-card-type {
@@ -1011,7 +1092,7 @@ body {
 
 .share-card-fragment {
   font-family: var(--serif);
-  font-size: 1.4rem;
+  font-size: 1.36rem;
   font-weight: 300;
   line-height: 2.0;
   color: var(--ink);
@@ -1024,19 +1105,20 @@ body {
   grid-area: media;
   align-self: center;
   margin: 0;
-  padding: 4px 0;
-  font-size: 1.12rem;
-  line-height: 1.85;
-  max-height: 140px;
+  padding: 0 0 0 18px;
+  border-left: 1px solid var(--rule);
+  font-size: 1.02rem;
+  line-height: 1.72;
+  max-height: 5.2em;
   overflow: hidden;
 }
 
 .share-card-preview--icon .share-card-fragment {
   order: 3;
-  margin: 12px 0 18px;
-  max-width: 260px;
-  font-size: 1.25rem;
-  line-height: 1.8;
+  margin: 14px 0 16px;
+  max-width: 220px;
+  font-size: 1.08rem;
+  line-height: 1.7;
 }
 
 .share-card-image-wrap {
@@ -1066,8 +1148,8 @@ body {
 }
 
 .share-card-preview--header .share-card-image {
-  height: 130px;
-  max-height: 130px;
+  height: 116px;
+  max-height: 116px;
 }
 
 .share-card-preview--icon .share-card-image {
@@ -1094,7 +1176,7 @@ body {
 
 .share-card-preview--header .share-card-meta {
   grid-area: meta;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
 }
 
 .share-card-preview--icon .share-card-meta {
@@ -1109,11 +1191,13 @@ body {
   letter-spacing: 0.04em;
   display: block;
   margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .share-card-preview--header .share-card-title {
-  font-size: 0.88rem;
-  line-height: 1.45;
+  font-size: 0.8rem;
+  line-height: 1.35;
   margin-bottom: 3px;
 }
 
@@ -1127,7 +1211,7 @@ body {
 }
 
 .share-card-preview--header .share-card-author {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
 }
 
 .share-card-comment {
@@ -1141,12 +1225,7 @@ body {
 }
 
 .share-card-preview--header .share-card-comment {
-  grid-area: comment;
-  margin: 0 0 10px;
-  font-size: 0.72rem;
-  line-height: 1.55;
-  max-height: 2.9em;
-  overflow: hidden;
+  display: none;
 }
 
 .share-card-preview--icon .share-card-comment {
@@ -1162,13 +1241,17 @@ body {
 
 .share-card-preview--header .share-card-tags {
   grid-area: tags;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  max-height: 1.2em;
 }
 
 .share-card-preview--icon .share-card-tags {
   order: 4;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  max-width: 220px;
+  overflow: hidden;
 }
 
 .share-card-tag {
@@ -1177,11 +1260,16 @@ body {
   font-weight: 300;
   color: var(--ink-light);
   letter-spacing: 0.08em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .share-card-preview--icon .share-card-tag {
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   color: var(--ink-mid);
+  max-width: 180px;
 }
 
 .share-card-color {
@@ -1199,8 +1287,8 @@ body {
 .share-card-preview--icon .share-card-color {
   order: 1;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 9px;
+  margin-bottom: 6px;
 }
 
 .share-card-color-dot {
@@ -1212,8 +1300,8 @@ body {
 }
 
 .share-card-preview--icon .share-card-color-dot {
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
 }
 
 .share-card-color-name {
@@ -1226,7 +1314,7 @@ body {
 
 .share-card-preview--icon .share-card-color-name {
   font-family: var(--serif);
-  font-size: 1rem;
+  font-size: 0.92rem;
   color: var(--ink);
 }
 
@@ -1264,48 +1352,90 @@ body {
     padding: 34px 28px 38px;
   }
   .share-card-preview--header {
-    width: 100%;
+    width: min(100%, 360px);
+    aspect-ratio: 3.4 / 1;
   }
   .share-card-preview--header .share-card-inner {
-    grid-template-columns: minmax(92px, 0.85fr) minmax(0, 1.15fr);
-    column-gap: 18px;
-    padding: 18px 24px 16px;
+    grid-template-columns: minmax(74px, 0.72fr) minmax(0, 1.28fr);
+    column-gap: 14px;
+    padding: 13px 16px 12px;
   }
   .share-card-preview--header .share-card-fragment {
-    font-size: 0.78rem;
-    line-height: 1.7;
-    max-height: 90px;
+    padding-left: 10px;
+    font-size: 0.64rem;
+    line-height: 1.55;
+    max-height: 4.7em;
   }
   .share-card-preview--header .share-card-image {
-    height: 86px;
-    max-height: 86px;
+    height: 66px;
+    max-height: 66px;
   }
   .share-card-preview--header .share-card-title {
-    font-size: 0.68rem;
-  }
-  .share-card-preview--header .share-card-author,
-  .share-card-preview--header .share-card-comment,
-  .share-card-preview--header .share-card-tag,
-  .share-card-preview--header .share-card-color-name,
-  .share-card-preview--header .share-card-color-hex {
     font-size: 0.58rem;
+    line-height: 1.28;
+    margin-bottom: 1px;
+  }
+  .share-card-preview--header .share-card-author {
+    display: none;
+  }
+  .share-card-preview--header .share-card-type,
+  .share-card-preview--header .share-card-tag,
+  .share-card-preview--header .share-card-color-name {
+    font-size: 0.5rem;
   }
   .share-card-preview--header .share-card-subtitle,
-  .share-card-preview--header .share-card-comment {
+  .share-card-preview--header .share-card-comment,
+  .share-card-preview--header .share-card-color-hex {
     display: none;
   }
   .share-card-preview--header .share-card-brand {
-    margin-top: 6px;
+    margin-top: 4px;
+  }
+  .share-card-preview--header .share-card-logo {
+    font-size: 0.5rem;
+  }
+  .share-card-preview--header .share-card-meta,
+  .share-card-preview--header .share-card-tags {
+    margin-bottom: 5px;
+  }
+  .share-card-preview--header .share-card-color {
+    gap: 5px;
+  }
+  .share-card-preview--header .share-card-color-dot {
+    width: 7px;
+    height: 7px;
   }
   .share-card-preview--icon {
-    width: min(100%, 340px);
+    width: min(100%, 300px);
   }
   .share-card-preview--icon .share-card-inner {
-    padding: 42px;
+    padding: 30px 28px 28px;
   }
   .share-card-preview--icon .share-card-fragment {
-    max-width: 220px;
-    font-size: 1.08rem;
+    max-width: 190px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 12px 0 12px;
+  }
+  .share-card-preview--icon .share-card-image-wrap {
+    width: 48%;
+    margin-bottom: 12px;
+  }
+  .share-card-preview--icon .share-card-color-dot {
+    width: 38px;
+    height: 38px;
+  }
+  .share-card-preview--icon .share-card-color-name {
+    font-size: 0.82rem;
+  }
+  .share-card-preview--icon .share-card-tag {
+    font-size: 0.62rem;
+  }
+  .share-card-preview--icon .share-card-tags {
+    margin-bottom: 10px;
+  }
+  .share-card-preview--icon .share-card-brand {
+    margin-top: 10px;
   }
   .share-card-fragment {
     font-size: 1.2rem;
