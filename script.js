@@ -8,6 +8,7 @@ let selectedColor  = null;
 let selectedTemplate = "post";
 let customSymbolText = "";
 let customTagText = "";
+const preloadedImages = new Map();
 
 const SHARE_TEMPLATES = {
   post: {
@@ -60,6 +61,29 @@ function typeBadgeClass(type) {
 
 function hasPaintingImage(content) {
   return content.type === "painting" && Boolean(content.imagePath);
+}
+
+function preloadImage(src) {
+  if (!src) return Promise.resolve();
+  if (preloadedImages.has(src)) return preloadedImages.get(src);
+
+  const promise = new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => resolve(src);
+    img.src = src;
+  });
+
+  preloadedImages.set(src, promise);
+  return promise;
+}
+
+function preloadPaintingImages() {
+  KASANE_CONTENTS
+    .filter(content => hasPaintingImage(content))
+    .forEach(content => {
+      preloadImage(content.imagePath);
+    });
 }
 
 function getLearnFallbackIntro(content) {
@@ -182,6 +206,7 @@ function renderFragment(content) {
     imageEl.removeAttribute("src");
     imageEl.alt = "";
     imageWrap.hidden = true;
+    imageWrap.classList.remove("fragment-image-wrap--float-in");
     fragmentEl.hidden = false;
     fragmentEl.innerHTML = content.fragment
       .split("\n")
@@ -842,21 +867,50 @@ function setFilter(filter) {
   showContent(filtered[currentIndex]);
 }
 
-// ── Next fragment ──────────────────────────────────────────────────────
-function nextFragment() {
-  const filtered = getFilteredContents(currentFilter);
-  currentIndex   = (currentIndex + 1) % filtered.length;
-  showContent(filtered[currentIndex]);
-
+function animateFragmentChange(content) {
   const card = document.querySelector(".fragment-card");
-  card.classList.remove("fragment-card--pulse");
-  void card.offsetWidth;
-  card.classList.add("fragment-card--pulse");
+  if (card) {
+    card.classList.remove("fragment-card--pulse");
+    void card.offsetWidth;
+    card.classList.add("fragment-card--pulse");
+  }
+
+  if (hasPaintingImage(content)) {
+    const imageWrap = document.getElementById("fragment-image-wrap");
+    if (imageWrap) {
+      imageWrap.classList.remove("fragment-image-wrap--float-in");
+      void imageWrap.offsetWidth;
+      imageWrap.classList.add("fragment-image-wrap--float-in");
+    }
+  }
+}
+
+// ── Next fragment ──────────────────────────────────────────────────────
+async function nextFragment() {
+  const nextButton = document.getElementById("btn-next");
+  const filtered = getFilteredContents(currentFilter);
+  const nextIndex = (currentIndex + 1) % filtered.length;
+  const nextContent = filtered[nextIndex];
+
+  if (nextButton) nextButton.disabled = true;
+
+  try {
+    if (hasPaintingImage(nextContent)) {
+      await preloadImage(nextContent.imagePath);
+    }
+
+    currentIndex = nextIndex;
+    showContent(nextContent);
+    animateFragmentChange(nextContent);
+  } finally {
+    if (nextButton) nextButton.disabled = false;
+  }
 }
 
 // ── Event wiring ───────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   initGenerator();
+  preloadPaintingImages();
 
   // type tabs
   document.querySelectorAll(".type-tab").forEach(btn => {
