@@ -953,7 +953,7 @@ body {
 .custom-symbol-input {
   width: 100%;
   font-family: var(--serif);
-  font-size: 0.9rem;
+  font-size: 16px;
   font-weight: 300;
   color: var(--ink);
   background: var(--bg-card);
@@ -972,7 +972,6 @@ body {
 
 .custom-symbol-input {
   max-width: 220px;
-  font-size: 0.95rem;
 }
 
 .custom-tag-input::placeholder,
