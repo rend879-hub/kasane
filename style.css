@@ -855,31 +855,6 @@ body {
   margin-top: -4px;
 }
 
-.oshi-input {
-  width: 100%;
-  font-family: var(--serif);
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: var(--ink);
-  background: var(--bg-card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  outline: none;
-  letter-spacing: 0.04em;
-  transition: border-color var(--transition);
-  -webkit-appearance: none;
-}
-
-.oshi-input::placeholder {
-  color: var(--ink-light);
-  font-weight: 300;
-}
-
-.oshi-input:focus {
-  border-color: var(--accent-soft);
-}
-
 /* ── Tag chips ── */
 .tag-options {
   display: flex;
