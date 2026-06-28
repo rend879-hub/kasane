@@ -1183,6 +1183,22 @@ body {
   max-width: 220px;
   font-size: 1.08rem;
   line-height: 1.7;
+  overflow: hidden;
+}
+
+.share-card-preview--icon .share-card-fragment--short {
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.share-card-preview--icon .share-card-fragment--medium {
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.share-card-preview--icon .share-card-fragment--long {
+  font-size: 0.84rem;
+  line-height: 1.6;
 }
 
 .share-card-image-wrap {
@@ -1515,6 +1531,18 @@ body {
     font-size: 0.92rem;
     line-height: 1.6;
     margin: 12px 0 12px;
+  }
+  .share-card-preview--icon .share-card-fragment--short {
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .share-card-preview--icon .share-card-fragment--medium {
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+  .share-card-preview--icon .share-card-fragment--long {
+    font-size: 0.76rem;
+    line-height: 1.5;
   }
   .share-card-preview--icon .share-card-image-wrap {
     width: 48%;

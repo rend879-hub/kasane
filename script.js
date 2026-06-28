@@ -30,7 +30,7 @@ const SHARE_TEMPLATES = {
     filename: "kasane-card-icon.png",
     exportWidth: 1024,
     tagLimit: 1,
-    fragmentLimit: 16
+    fragmentLimit: 32
   }
 };
 
@@ -320,6 +320,63 @@ function truncateText(text, limit) {
   return normalized.slice(0, limit).trim() + "…";
 }
 
+function normalizeFragmentLines(text) {
+  return (text || "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map(line => line.replace(/[ \t]+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function getIconFragmentDetails(text, limit) {
+  const lines = normalizeFragmentLines(text);
+  const normalized = lines.join("\n");
+  const flatLength = normalized.replace(/\n/g, "").length;
+  const safeLimit = Math.max(limit, 32);
+  const ellipsisLimit = Math.min(Math.max(safeLimit, 32), 36);
+
+  if (flatLength <= 16) {
+    return { text: normalized, sizeClass: "share-card-fragment--short" };
+  }
+
+  if (flatLength <= 28) {
+    return { text: normalized, sizeClass: "share-card-fragment--medium" };
+  }
+
+  if (flatLength <= 36) {
+    return { text: normalized, sizeClass: "share-card-fragment--long" };
+  }
+
+  let remaining = ellipsisLimit;
+  const clippedLines = [];
+
+  for (const line of lines) {
+    if (remaining <= 0) break;
+    if (line.length <= remaining) {
+      clippedLines.push(line);
+      remaining -= line.length;
+    } else {
+      clippedLines.push(line.slice(0, remaining).trimEnd());
+      remaining = 0;
+    }
+  }
+
+  return {
+    text: clippedLines.join("\n").trimEnd() + "…",
+    sizeClass: "share-card-fragment--long"
+  };
+}
+
+function appendFragmentLines(element, text) {
+  const lines = (text || "").split("\n");
+  lines.forEach((line, index) => {
+    if (index > 0) element.appendChild(document.createElement("br"));
+    const span = document.createElement("span");
+    span.textContent = line;
+    element.appendChild(span);
+  });
+}
+
 function setSelectedTemplate(template) {
   if (!SHARE_TEMPLATES[template]) return;
   selectedTemplate = template;
@@ -390,11 +447,16 @@ function renderPreview() {
   } else {
     media = document.createElement("div");
     media.className = "share-card-fragment";
-    const fragmentText = truncateText(currentContent.fragment, template.fragmentLimit);
-    media.innerHTML = fragmentText
-      .split("\n")
-      .map(line => `<span>${line}</span>`)
-      .join("<br>");
+    const fragmentDetails = selectedTemplate === "icon"
+      ? getIconFragmentDetails(currentContent.fragment, template.fragmentLimit)
+      : {
+          text: truncateText(currentContent.fragment, template.fragmentLimit),
+          sizeClass: ""
+        };
+    if (fragmentDetails.sizeClass) {
+      media.classList.add(fragmentDetails.sizeClass);
+    }
+    appendFragmentLines(media, fragmentDetails.text);
   }
 
   // rule
@@ -596,6 +658,9 @@ function drawTextElement(context, element, baseRect) {
   if (line) lines.push(line);
 
   lines.forEach((lineText, index) => {
+    if (rect.y + lineHeight * (index + 1) > rect.y + rect.height + 0.5) {
+      return;
+    }
     context.fillText(lineText, rect.x, rect.y + lineHeight * index);
   });
   context.restore();
