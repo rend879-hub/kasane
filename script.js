@@ -5,7 +5,6 @@ let currentSection = "generator";
 let currentContent = null;
 let selectedTags   = [];
 let selectedColor  = null;
-let customOshiText = "";
 let selectedTemplate = "post";
 let customSymbolText = "";
 let customTagText = "";
@@ -293,20 +292,14 @@ function updateCustomTag(value) {
   if (currentSection === "preview") renderPreview();
 }
 
-// ── Oshi text ──────────────────────────────────────────────────────────
-function updateOshiText(value) {
-  customOshiText = value.trim();
-}
-
 function getShareCardTags() {
   if (!currentContent) return [];
   const baseTags = selectedTags.length > 0 ? selectedTags : currentContent.tags;
-  const oshiTag = customOshiText ? customOshiText + "っぽい" : null;
   const customTag = customTagText ? customTagText : null;
+
   return [
     ...(customTag ? [customTag] : []),
-    ...baseTags,
-    ...(oshiTag ? [oshiTag] : [])
+    ...baseTags
   ];
 }
 
@@ -404,9 +397,6 @@ function renderPreview() {
   container.className = "share-card-preview " + template.className;
 
   const color = selectedColor || currentContent.defaultColor;
-  const oshiInput = document.getElementById("oshi-input");
-  const oshiText = oshiInput ? oshiInput.value.trim() : customOshiText;
-  customOshiText = oshiText;
 
   // stripe
   const stripe = document.createElement("div");
@@ -806,11 +796,10 @@ async function savePreviewImage() {
 }
 
 // ── Show content ───────────────────────────────────────────────────────
-function showContent(content, resetOshi) {
+function showContent(content) {
   currentContent = content;
   selectedTags   = [...content.tags];
   selectedColor  = content.defaultColor;
-  if (resetOshi) customOshiText = "";
 
   renderFragment(content);
   renderLearnPanels(content);
@@ -823,7 +812,7 @@ function initGenerator() {
   const filtered = getFilteredContents(currentFilter);
   const seed     = dateSeed();
   currentIndex   = seedIndex(seed, filtered.length);
-  showContent(filtered[currentIndex], false);
+  showContent(filtered[currentIndex]);
 }
 
 // ── Section switching ──────────────────────────────────────────────────
@@ -850,14 +839,14 @@ function setFilter(filter) {
   const filtered = getFilteredContents(filter);
   const seed     = dateSeed();
   currentIndex   = seedIndex(seed, filtered.length);
-  showContent(filtered[currentIndex], false);
+  showContent(filtered[currentIndex]);
 }
 
 // ── Next fragment ──────────────────────────────────────────────────────
 function nextFragment() {
   const filtered = getFilteredContents(currentFilter);
   currentIndex   = (currentIndex + 1) % filtered.length;
-  showContent(filtered[currentIndex], false);  // preserve oshi text
+  showContent(filtered[currentIndex]);
 
   const card = document.querySelector(".fragment-card");
   card.classList.remove("fragment-card--pulse");
@@ -890,11 +879,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "別の断片を見る"
   document.getElementById("btn-next").addEventListener("click", nextFragment);
-
-  // oshi input
-  document.getElementById("oshi-input").addEventListener("input", e => {
-    updateOshiText(e.target.value);
-  });
 
   const customTagInput = document.getElementById("custom-tag-input");
   if (customTagInput) {
