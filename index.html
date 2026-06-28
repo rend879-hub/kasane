@@ -42,6 +42,10 @@
         <button class="type-tab"                  data-type="poem"    aria-pressed="false">詩</button>
       </div>
 
+      <div class="fragment-actions fragment-actions--top">
+        <button class="btn btn--ghost" id="btn-next">別の断片を見る</button>
+      </div>
+
       <!-- Fragment card -->
       <article class="fragment-card" aria-label="文化断片">
         <span class="badge" id="fragment-badge">古典</span>
@@ -83,6 +87,13 @@
         <div class="control-block">
           <p class="control-label" id="tag-label">タグを重ねる</p>
           <div id="tag-options" class="tag-options" role="group" aria-labelledby="tag-label"></div>
+
+          <label class="control-label control-label--sub" for="custom-tag-input">自分でタグを追加する</label>
+          <p class="control-help">#を入れても入れなくても大丈夫です。カードにはタグとして表示されます。</p>
+          <input id="custom-tag-input" class="custom-tag-input" type="text"
+            placeholder="例：夜明けの人 / 青い孤独 / 声がきれい"
+            maxlength="24"
+            autocomplete="off">
         </div>
 
         <div class="control-block">
@@ -91,12 +102,8 @@
         </div>
 
         <div class="control-block">
-          <p class="control-label" id="symbol-label">記号を添える</p>
-          <p class="control-help">選んだ色で、カードに小さな記号を添えます。空欄のままでも大丈夫です。</p>
-          <div id="symbol-options" class="symbol-options" role="group" aria-labelledby="symbol-label"></div>
-
-          <label class="control-label control-label--sub" for="custom-symbol-input">自分で入力する</label>
-          <p class="control-help">絵文字や記号を1〜2文字だけ入力できます。</p>
+          <label class="control-label" for="custom-symbol-input">記号を添える</label>
+          <p class="control-help">絵文字や記号を1〜2文字だけ入力できます。空欄のままでも大丈夫です。</p>
           <input id="custom-symbol-input" class="custom-symbol-input" type="text"
             placeholder="例：🌙 / 🩵 / 🫧"
             maxlength="4"
@@ -107,7 +114,6 @@
 
       <!-- Actions -->
       <div class="actions">
-        <button class="btn btn--ghost"   id="btn-next">別の断片を見る</button>
         <button class="btn btn--primary" id="btn-preview">カードを生成する</button>
       </div>
 
