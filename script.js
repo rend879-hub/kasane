@@ -55,6 +55,84 @@ function seedIndex(seed, len) {
   return ((seed * 1664525 + 1013904223) >>> 0) % len;
 }
 
+function seededUnit(seed) {
+  return (((seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+}
+
+function hasPresencePreference() {
+  const hasTags = Array.isArray(presenceSettings.tags) && presenceSettings.tags.length > 0;
+  const name = (presenceSettings.name || "").trim();
+  return presenceSettings.enabled && (hasTags || name.length >= 2);
+}
+
+function normalizePresenceText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getPresenceScore(content) {
+  if (!hasPresencePreference() || !content) return 0;
+
+  const contentTags = Array.isArray(content.tags) ? content.tags : [];
+  const presenceTags = Array.isArray(presenceSettings.tags) ? presenceSettings.tags : [];
+  const matchedTagCount = presenceTags.filter(tag => contentTags.includes(tag)).length;
+  let score = matchedTagCount * 1.4;
+
+  const name = normalizePresenceText(presenceSettings.name);
+  if (name.length >= 2) {
+    const nameFields = [
+      content.themeGroup,
+      content.title,
+      content.author,
+      content.shortComment,
+      contentTags.join(" ")
+    ];
+
+    if (nameFields.some(field => normalizePresenceText(field).includes(name))) {
+      score += 0.6;
+    }
+  }
+
+  return Math.min(score, 3);
+}
+
+function getPresenceWeight(content) {
+  return 1 + getPresenceScore(content) * 0.45;
+}
+
+function pickWeightedIndex(contents, excludedIndex, randomUnit) {
+  if (!contents.length) return null;
+
+  const candidates = contents
+    .map((content, index) => ({ index, weight: getPresenceWeight(content) }))
+    .filter(item => item.index !== excludedIndex);
+
+  if (!candidates.length) return 0;
+
+  const totalWeight = candidates.reduce((sum, item) => sum + item.weight, 0);
+  let cursor = Math.max(0, Math.min(randomUnit, 0.999999)) * totalWeight;
+
+  for (const item of candidates) {
+    cursor -= item.weight;
+    if (cursor <= 0) return item.index;
+  }
+
+  return candidates[candidates.length - 1].index;
+}
+
+function pickPresenceWeightedIndex(contents, currentIndex, seed) {
+  if (!contents.length) return null;
+
+  if (!hasPresencePreference()) {
+    return typeof currentIndex === "number"
+      ? (currentIndex + 1) % contents.length
+      : seedIndex(seed, contents.length);
+  }
+
+  const randomUnit = typeof seed === "number" ? seededUnit(seed) : Math.random();
+  const excludedIndex = typeof currentIndex === "number" ? currentIndex : null;
+  return pickWeightedIndex(contents, excludedIndex, randomUnit);
+}
+
 function typeLabel(type) {
   const map = { classic: "古典", painting: "絵画", poem: "詩" };
   return map[type] || type;
@@ -931,7 +1009,7 @@ function showContent(content) {
 function initGenerator() {
   const filtered = getFilteredContents(currentFilter);
   const seed     = dateSeed();
-  currentIndex   = seedIndex(seed, filtered.length);
+  currentIndex   = pickPresenceWeightedIndex(filtered, null, seed);
   showContent(filtered[currentIndex]);
 }
 
@@ -966,7 +1044,7 @@ function setFilter(filter) {
 
   const filtered = getFilteredContents(filter);
   const seed     = dateSeed();
-  currentIndex   = seedIndex(seed, filtered.length);
+  currentIndex   = pickPresenceWeightedIndex(filtered, null, seed);
   showContent(filtered[currentIndex]);
 }
 
@@ -992,7 +1070,7 @@ function animateFragmentChange(content) {
 async function nextFragment() {
   const nextButton = document.getElementById("btn-next");
   const filtered = getFilteredContents(currentFilter);
-  const nextIndex = (currentIndex + 1) % filtered.length;
+  const nextIndex = pickPresenceWeightedIndex(filtered, currentIndex);
   const nextContent = filtered[nextIndex];
 
   if (nextButton) nextButton.disabled = true;
