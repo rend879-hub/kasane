@@ -1714,18 +1714,23 @@ body {
 }
 
 .bookmark-title {
-  display: block;
+  display: -webkit-box;
   font-family: var(--serif);
   font-size: 0.58rem;
   font-weight: 400;
   line-height: 1.5;
   color: var(--ink);
   letter-spacing: 0.03em;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .bookmark-author {
-  display: block;
+  display: -webkit-box;
   margin-top: 4px;
   font-family: var(--sans);
   font-size: 0.5rem;
@@ -1733,7 +1738,12 @@ body {
   line-height: 1.5;
   color: var(--ink-mid);
   letter-spacing: 0.04em;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .bookmark-tags {
