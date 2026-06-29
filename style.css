@@ -1582,14 +1582,14 @@ body {
 }
 
 .bookmark-sheet-preview {
-  width: min(100%, 620px);
-  aspect-ratio: 127 / 89;
+  width: min(100%, 430px);
+  aspect-ratio: 89 / 127;
   margin: 0 auto;
-  padding: 7% 8%;
+  padding: 8% 7%;
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 7%;
+  gap: 6%;
   overflow: hidden;
   background:
     linear-gradient(90deg, transparent calc(50% - 0.5px), rgba(128, 116, 101, 0.24) calc(50% - 0.5px), rgba(128, 116, 101, 0.24) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
@@ -1603,26 +1603,26 @@ body {
 .bookmark-sheet-preview::after {
   content: "";
   position: absolute;
-  top: 7%;
-  bottom: 7%;
+  top: 8%;
+  bottom: 8%;
   width: 1px;
   background: rgba(128, 116, 101, 0.18);
   pointer-events: none;
 }
 
 .bookmark-sheet-preview::before {
-  left: 8%;
+  left: 7%;
 }
 
 .bookmark-sheet-preview::after {
-  right: 8%;
+  right: 7%;
 }
 
 .bookmark-item {
   position: relative;
   min-width: 0;
   height: 100%;
-  padding: 8% 9% 9%;
+  padding: 10% 10% 11%;
   display: flex;
   flex-direction: column;
   background: #FDFCF7;
@@ -1653,7 +1653,7 @@ body {
   align-self: flex-end;
   min-height: 1.35em;
   font-family: var(--serif);
-  font-size: 1.14rem;
+  font-size: 1rem;
   font-weight: 300;
   line-height: 1;
   color: var(--bookmark-accent, var(--accent-current));
@@ -1661,9 +1661,9 @@ body {
 }
 
 .bookmark-type {
-  margin-top: 8%;
+  margin-top: 12%;
   font-family: var(--sans);
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   font-weight: 300;
   line-height: 1.4;
   color: var(--ink-light);
@@ -1671,11 +1671,11 @@ body {
 }
 
 .bookmark-fragment {
-  margin-top: 7%;
+  margin-top: 10%;
   font-family: var(--serif);
-  font-size: 0.86rem;
+  font-size: 0.72rem;
   font-weight: 300;
-  line-height: 1.82;
+  line-height: 1.78;
   color: var(--ink);
   letter-spacing: 0.04em;
   word-break: break-all;
@@ -1683,17 +1683,17 @@ body {
 
 .bookmark-image {
   width: 100%;
-  max-height: 30%;
-  margin-top: 7%;
+  max-height: 22%;
+  margin-top: 10%;
   object-fit: contain;
   background: #F8F6F1;
   border: 1px solid rgba(224, 221, 215, 0.9);
 }
 
 .bookmark-rule {
-  width: 22px;
+  width: 18px;
   height: 1px;
-  margin: 9% 0 7%;
+  margin: 12% 0 9%;
   background: rgba(128, 116, 101, 0.26);
 }
 
@@ -1714,7 +1714,7 @@ body {
 .bookmark-title {
   display: block;
   font-family: var(--serif);
-  font-size: 0.66rem;
+  font-size: 0.58rem;
   font-weight: 400;
   line-height: 1.5;
   color: var(--ink);
@@ -1726,7 +1726,7 @@ body {
   display: block;
   margin-top: 4px;
   font-family: var(--sans);
-  font-size: 0.56rem;
+  font-size: 0.5rem;
   font-weight: 300;
   line-height: 1.5;
   color: var(--ink-mid);
@@ -1736,7 +1736,7 @@ body {
 
 .bookmark-tags {
   margin-top: auto;
-  padding-top: 9%;
+  padding-top: 12%;
   display: flex;
   flex-wrap: wrap;
   gap: 4px 6px;
@@ -1748,7 +1748,7 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--sans);
-  font-size: 0.5rem;
+  font-size: 0.46rem;
   font-weight: 300;
   color: var(--ink-light);
   letter-spacing: 0.04em;
@@ -1760,7 +1760,7 @@ body {
   align-items: center;
   gap: 6px;
   font-family: var(--sans);
-  font-size: 0.52rem;
+  font-size: 0.47rem;
   font-weight: 300;
   color: var(--ink-light);
   letter-spacing: 0.08em;
@@ -1779,7 +1779,7 @@ body {
 .bookmark-brand {
   margin-top: 8px;
   font-family: var(--serif);
-  font-size: 0.52rem;
+  font-size: 0.48rem;
   font-weight: 500;
   color: var(--ink-light);
   letter-spacing: 0.18em;
