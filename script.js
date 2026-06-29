@@ -40,6 +40,7 @@ const SHARE_TEMPLATES = {
   }
 };
 const BOOKMARK_EXPORT_WIDTH = 1800;
+const BOOKMARK_EXPORT_HEIGHT = Math.round(BOOKMARK_EXPORT_WIDTH * 127 / 89);
 const BOOKMARK_FILENAME = "kasane-bookmark-lsize.png";
 const BOOKMARK_TAG_LIMIT = 4;
 
@@ -1061,17 +1062,19 @@ function drawPreviewToCanvas(card, scale) {
   return canvas;
 }
 
-function drawBookmarkToCanvas(sheet, scale) {
+function drawBookmarkToCanvas(sheet) {
   const baseRect = sheet.getBoundingClientRect();
   const width = Math.ceil(baseRect.width);
   const height = Math.ceil(baseRect.height);
   const sheetStyle = window.getComputedStyle(sheet);
   const canvas = document.createElement("canvas");
-  canvas.width = width * scale;
-  canvas.height = height * scale;
+  canvas.width = BOOKMARK_EXPORT_WIDTH;
+  canvas.height = BOOKMARK_EXPORT_HEIGHT;
 
   const context = canvas.getContext("2d");
-  context.scale(scale, scale);
+  const scaleX = BOOKMARK_EXPORT_WIDTH / Math.max(width, 1);
+  const scaleY = BOOKMARK_EXPORT_HEIGHT / Math.max(height, 1);
+  context.scale(scaleX, scaleY);
 
   const sheetBackground = sheetStyle.backgroundColor === "rgba(0, 0, 0, 0)"
     ? "#F8F4EA"
@@ -1193,9 +1196,7 @@ async function saveBookmarkImage() {
 
   try {
     await waitForPreviewImages(sheet);
-    const sheetWidth = Math.ceil(sheet.getBoundingClientRect().width) || 1;
-    const scale = Math.max(2, BOOKMARK_EXPORT_WIDTH / sheetWidth);
-    const canvas = drawBookmarkToCanvas(sheet, scale);
+    const canvas = drawBookmarkToCanvas(sheet);
     const blob = await canvasToBlob(canvas);
     const pngUrl = URL.createObjectURL(blob);
     createImageDownload(pngUrl, BOOKMARK_FILENAME);
