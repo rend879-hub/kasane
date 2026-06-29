@@ -5,6 +5,7 @@ let currentSection = "generator";
 let currentContent = null;
 let selectedTags   = [];
 let selectedColor  = null;
+let visibleTagOptions = [];
 let selectedTemplate = "post";
 let customSymbolText = "";
 let customTagText = "";
@@ -45,6 +46,79 @@ const BOOKMARK_EXPORT_WIDTH = 1800;
 const BOOKMARK_EXPORT_HEIGHT = Math.round(BOOKMARK_EXPORT_WIDTH * 127 / 89);
 const BOOKMARK_FILENAME = "kasane-bookmark-lsize.png";
 const BOOKMARK_TAG_LIMIT = 4;
+const COLOR_FINDER_OPTIONS = [
+  {
+    id: "sakura",
+    label: "桜",
+    colorName: "桜色",
+    tags: ["春", "儚い", "光", "祝福"],
+    description: "やわらかく、少しだけ儚い気配を持つ色です。春、記憶、祝福、淡い光に近い断片とよく重なります。"
+  },
+  {
+    id: "ruri",
+    label: "青",
+    colorName: "瑠璃色",
+    tags: ["夜", "祈り", "静けさ", "青"],
+    description: "深く澄んだ青です。夜、祈り、静けさ、遠い光に近い断片とよく重なります。"
+  },
+  {
+    id: "asagi",
+    label: "青緑",
+    colorName: "浅葱色",
+    tags: ["青", "風", "透明感", "水"],
+    description: "青と緑のあわいにある色です。風、水、透明感、若さに近い断片とよく重なります。"
+  },
+  {
+    id: "fuji",
+    label: "紫",
+    colorName: "藤色",
+    tags: ["静けさ", "祈り", "余白", "儚い"],
+    description: "淡く静かな紫です。祈り、余白、儚さ、静かな感情に近い断片とよく重なります。"
+  },
+  {
+    id: "gofun",
+    label: "白",
+    colorName: "胡粉色",
+    tags: ["光", "祈り", "透明感", "雪"],
+    description: "やわらかい白です。光、祈り、雪、透明感に近い断片とよく重なります。"
+  },
+  {
+    id: "sumi",
+    label: "黒",
+    colorName: "墨色",
+    tags: ["夜", "孤独", "不穏", "影"],
+    description: "深い黒に近い色です。夜、孤独、不穏、強い輪郭を持つ断片とよく重なります。"
+  },
+  {
+    id: "ginnezumi",
+    label: "灰",
+    colorName: "銀鼠",
+    tags: ["無常", "静けさ", "余白", "孤独"],
+    description: "静かで控えめな灰色です。余白、無常、ひとりの時間、落ち着いた断片とよく重なります。"
+  },
+  {
+    id: "kinari",
+    label: "生成",
+    colorName: "生成色",
+    tags: ["余白", "物語", "日記", "やさしさ"],
+    description: "紙や布のような自然な色です。余白、日記、物語、やさしい静けさに近い断片とよく重なります。"
+  },
+  {
+    id: "ki",
+    label: "黄",
+    colorName: "山吹色",
+    tags: ["光", "黄色", "祝福", "花"],
+    description: "明るい光を思わせる色です。花、祝福、生命感、まっすぐな明るさに近い断片とよく重なります。"
+  },
+  {
+    id: "aka",
+    label: "赤",
+    colorName: "薄紅",
+    tags: ["恋", "春", "花", "凛とした"],
+    description: "熱を帯びたやわらかな赤です。恋、花、春、まっすぐな感情に近い断片とよく重なります。"
+  }
+];
+let selectedColorFinderOption = null;
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -325,6 +399,7 @@ function renderFragment(content) {
 // ── Tag options ────────────────────────────────────────────────────────
 function renderTagOptions(tags) {
   const container = document.getElementById("tag-options");
+  visibleTagOptions = [...tags];
   container.innerHTML = "";
   tags.forEach(tag => {
     const btn = document.createElement("button");
@@ -342,7 +417,7 @@ function toggleTag(tag) {
   } else {
     selectedTags = [...selectedTags, tag];
   }
-  if (currentContent) renderTagOptions(currentContent.tags);
+  if (currentContent) renderTagOptions(visibleTagOptions.length ? visibleTagOptions : currentContent.tags);
 }
 
 // ── Presence settings ─────────────────────────────────────────────────
@@ -470,6 +545,183 @@ function selectColor(color) {
   renderColorOptions();
 
   if (currentSection === "preview") renderPreview();
+}
+
+// ── Color finder ──────────────────────────────────────────────────────
+function getColorFinderColor(option) {
+  return KASANE_COLORS.find(color => color.name === option.colorName) || KASANE_COLORS[0];
+}
+
+function getColorFinderMatches(option) {
+  const relatedTags = option.tags || [];
+  const scored = KASANE_CONTENTS
+    .map(content => {
+      const contentTags = Array.isArray(content.tags) ? content.tags : [];
+      const tagScore = relatedTags.filter(tag => contentTags.includes(tag)).length;
+      const themeText = [
+        content.themeGroup,
+        content.shortComment,
+        content.title
+      ].join(" ");
+      const themeScore = relatedTags.filter(tag => themeText.includes(tag)).length * 0.4;
+      return { content, score: tagScore + themeScore };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.map(item => item.content);
+}
+
+function pickColorFinderContent(option) {
+  const matches = getColorFinderMatches(option);
+  if (matches.length) return matches[0];
+  return currentContent || KASANE_CONTENTS[0];
+}
+
+function renderColorFinderOptions() {
+  const container = document.getElementById("color-finder-options");
+  if (!container) return;
+
+  container.innerHTML = "";
+  COLOR_FINDER_OPTIONS.forEach(option => {
+    const color = getColorFinderColor(option);
+    const isActive = selectedColorFinderOption && selectedColorFinderOption.id === option.id;
+    const btn = document.createElement("button");
+    btn.className = "color-finder-chip" + (isActive ? " color-finder-chip--active" : "");
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    btn.setAttribute("aria-label", option.label + "から探す");
+
+    const swatch = document.createElement("span");
+    swatch.className = "color-finder-swatch";
+    swatch.style.background = color.hex;
+    swatch.style.borderColor = color.hex === "#FFFFFC" || color.hex === "#FBFAF5" ? "#E0DDD7" : "rgba(0,0,0,0.12)";
+
+    const label = document.createElement("span");
+    label.className = "color-finder-chip-label";
+    label.textContent = option.label;
+
+    btn.appendChild(swatch);
+    btn.appendChild(label);
+    btn.addEventListener("click", () => selectColorFinderOption(option));
+    container.appendChild(btn);
+  });
+}
+
+function renderColorFinderResult(option) {
+  const container = document.getElementById("color-finder-result");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!option) {
+    const empty = document.createElement("p");
+    empty.className = "color-finder-empty";
+    empty.textContent = "気になる色をひとつ選んでください。";
+    container.appendChild(empty);
+    return;
+  }
+
+  const color = getColorFinderColor(option);
+  const content = pickColorFinderContent(option);
+
+  const header = document.createElement("div");
+  header.className = "color-finder-result-header";
+
+  const swatch = document.createElement("span");
+  swatch.className = "color-finder-result-swatch";
+  swatch.style.background = color.hex;
+  swatch.style.borderColor = color.hex === "#FFFFFC" || color.hex === "#FBFAF5" ? "#E0DDD7" : "rgba(0,0,0,0.12)";
+
+  const heading = document.createElement("div");
+  const name = document.createElement("h2");
+  name.className = "color-finder-result-title";
+  name.textContent = color.name;
+
+  const basic = document.createElement("p");
+  basic.className = "color-finder-result-basic";
+  basic.textContent = "伝統色";
+
+  heading.appendChild(name);
+  heading.appendChild(basic);
+  header.appendChild(swatch);
+  header.appendChild(heading);
+
+  const description = document.createElement("p");
+  description.className = "color-finder-description";
+  description.textContent = option.description;
+
+  const tagList = document.createElement("div");
+  tagList.className = "color-finder-tags";
+  option.tags.forEach(tag => {
+    const tagEl = document.createElement("span");
+    tagEl.className = "color-finder-tag";
+    tagEl.textContent = "#" + tag;
+    tagList.appendChild(tagEl);
+  });
+
+  const fragment = document.createElement("div");
+  fragment.className = "color-finder-fragment";
+
+  const fragmentLabel = document.createElement("p");
+  fragmentLabel.className = "color-finder-fragment-label";
+  fragmentLabel.textContent = "気配に近い断片";
+
+  const fragmentText = document.createElement("p");
+  fragmentText.className = "color-finder-fragment-text";
+  fragmentText.textContent = content.fragment;
+
+  const fragmentMeta = document.createElement("p");
+  fragmentMeta.className = "color-finder-fragment-meta";
+  fragmentMeta.textContent = "『" + content.title + "』 " + content.author;
+
+  fragment.appendChild(fragmentLabel);
+  fragment.appendChild(fragmentText);
+  fragment.appendChild(fragmentMeta);
+
+  const action = document.createElement("button");
+  action.className = "btn btn--primary color-finder-action";
+  action.type = "button";
+  action.textContent = "この色でカードを作る";
+  action.addEventListener("click", () => applyColorFinderOption(option));
+
+  container.appendChild(header);
+  container.appendChild(description);
+  container.appendChild(tagList);
+  container.appendChild(fragment);
+  container.appendChild(action);
+}
+
+function selectColorFinderOption(option) {
+  selectedColorFinderOption = option;
+  renderColorFinderOptions();
+  renderColorFinderResult(option);
+}
+
+function setTypeTabState(filter) {
+  document.querySelectorAll(".type-tab").forEach(btn => {
+    const active = btn.dataset.type === filter;
+    btn.classList.toggle("type-tab--active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+}
+
+function applyColorFinderOption(option) {
+  const content = pickColorFinderContent(option);
+  const color = getColorFinderColor(option);
+  const mergedTags = [...new Set([...(option.tags || []), ...(content.tags || [])])];
+
+  currentFilter = "all";
+  currentIndex = KASANE_CONTENTS.findIndex(candidate => candidate.contentId === content.contentId);
+  currentContent = content;
+  selectedColor = color;
+  selectedTags = [...option.tags];
+
+  setTypeTabState(currentFilter);
+  renderFragment(content);
+  renderLearnPanels(content);
+  renderTagOptions(mergedTags);
+  renderColorOptions();
+  showSection("generator");
 }
 
 // ── Custom symbol ──────────────────────────────────────────────────────
@@ -1579,6 +1831,10 @@ function showSection(name) {
     btn.classList.toggle("active", name === "library");
   });
 
+  document.querySelectorAll(".nav-color-finder-btn").forEach(btn => {
+    btn.classList.toggle("active", name === "color-finder");
+  });
+
   if (name === "presence") {
     syncPresenceForm();
   }
@@ -1587,17 +1843,18 @@ function showSection(name) {
     renderLibraryItems();
     setLibrarySaveMessage("");
   }
+
+  if (name === "color-finder") {
+    renderColorFinderOptions();
+    renderColorFinderResult(selectedColorFinderOption);
+  }
 }
 
 // ── Filter / type switching ────────────────────────────────────────────
 function setFilter(filter) {
   currentFilter = filter;
 
-  document.querySelectorAll(".type-tab").forEach(btn => {
-    const active = btn.dataset.type === filter;
-    btn.classList.toggle("type-tab--active", active);
-    btn.setAttribute("aria-pressed", active ? "true" : "false");
-  });
+  setTypeTabState(filter);
 
   const filtered = getFilteredContents(filter);
   const seed     = dateSeed();
@@ -1651,6 +1908,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initGenerator();
   preloadPaintingImages();
   syncPresenceForm();
+  renderColorFinderOptions();
+  renderColorFinderResult(selectedColorFinderOption);
 
   // type tabs
   document.querySelectorAll(".type-tab").forEach(btn => {
@@ -1677,6 +1936,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".nav-library-btn").forEach(btn => {
     btn.addEventListener("click", () => showSection("library"));
+  });
+
+  document.querySelectorAll(".nav-color-finder-btn").forEach(btn => {
+    btn.addEventListener("click", () => showSection("color-finder"));
   });
 
   // "別の断片を見る"
