@@ -1266,9 +1266,13 @@ async function saveBookmarkImage() {
     await waitForPreviewImages(sheet);
     const canvas = drawBookmarkToCanvas(sheet);
     const blob = await canvasToBlob(canvas);
-    const pngUrl = URL.createObjectURL(blob);
-    createImageDownload(pngUrl, BOOKMARK_FILENAME);
-    setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+    const shared = await shareImageFile(blob, BOOKMARK_FILENAME);
+
+    if (!shared) {
+      const pngUrl = URL.createObjectURL(blob);
+      createImageDownload(pngUrl, BOOKMARK_FILENAME);
+      setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+    }
   } catch (error) {
     console.error(error);
     window.alert("しおり画像を保存できませんでした。別のブラウザでお試しください。");
