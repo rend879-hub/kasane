@@ -956,6 +956,55 @@ function drawTextElement(context, element, baseRect) {
   context.restore();
 }
 
+function buildCanvasTextLines(context, text, maxWidth, maxLines) {
+  const chars = [...(text || "").replace(/\s+/g, " ").trim()];
+  const lines = [];
+  let line = "";
+
+  chars.forEach(char => {
+    const nextLine = line + char;
+    if (line && context.measureText(nextLine).width > maxWidth) {
+      lines.push(line);
+      line = char.trimStart();
+    } else {
+      line = nextLine;
+    }
+  });
+  if (line) lines.push(line);
+
+  if (lines.length <= maxLines) return lines;
+
+  const clamped = lines.slice(0, maxLines);
+  let lastLine = clamped[maxLines - 1] || "";
+  while (lastLine && context.measureText(lastLine + "…").width > maxWidth) {
+    lastLine = [...lastLine].slice(0, -1).join("");
+  }
+  clamped[maxLines - 1] = (lastLine || "").trimEnd() + "…";
+  return clamped;
+}
+
+function drawClampedTextElement(context, element, baseRect, maxLines) {
+  const rect = getRelativeRect(element, baseRect);
+  const style = window.getComputedStyle(element);
+  if (style.display === "none" || style.visibility === "hidden" || rect.width <= 0 || rect.height <= 0) {
+    return;
+  }
+
+  setCanvasFont(context, element);
+  const fontSize = parseFloat(style.fontSize) || 16;
+  const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
+  const opacity = parseFloat(style.opacity);
+  const lines = buildCanvasTextLines(context, element.textContent || "", rect.width, maxLines);
+
+  context.save();
+  context.globalAlpha = Number.isNaN(opacity) ? 1 : opacity;
+  lines.forEach((lineText, index) => {
+    if (index >= maxLines) return;
+    context.fillText(lineText, rect.x, rect.y + lineHeight * index);
+  });
+  context.restore();
+}
+
 function drawImageElement(context, image, baseRect) {
   const rect = getRelativeRect(image, baseRect);
   if (rect.width <= 0 || rect.height <= 0) return;
@@ -1141,9 +1190,13 @@ function drawBookmarkToCanvas(sheet) {
     }
 
     item.querySelectorAll(
-      ".bookmark-symbol, .bookmark-type, .bookmark-fragment, .bookmark-title, .bookmark-author, .bookmark-tag, .bookmark-color-name, .bookmark-brand"
+      ".bookmark-symbol, .bookmark-type, .bookmark-fragment, .bookmark-tag, .bookmark-color-name, .bookmark-brand"
     ).forEach(element => {
       drawTextElement(context, element, baseRect);
+    });
+
+    item.querySelectorAll(".bookmark-title, .bookmark-author").forEach(element => {
+      drawClampedTextElement(context, element, baseRect, 2);
     });
 
     context.restore();
