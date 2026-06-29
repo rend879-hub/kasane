@@ -734,8 +734,16 @@ function renderPreview() {
 // ── Bookmark preview render ───────────────────────────────────────────
 function createBookmarkItem() {
   const color = selectedColor || currentContent.defaultColor;
+  const titleText = "『" + currentContent.title + "』";
+  const authorText = currentContent.author;
+  const metaLength = [...titleText + authorText].length;
   const item = document.createElement("div");
   item.className = "bookmark-item";
+  if (metaLength >= 42) {
+    item.classList.add("bookmark-item--very-long-meta");
+  } else if (metaLength >= 30) {
+    item.classList.add("bookmark-item--long-meta");
+  }
   item.style.setProperty("--bookmark-accent", color.hex);
 
   const symbol = document.createElement("span");
@@ -773,10 +781,10 @@ function createBookmarkItem() {
   meta.className = "bookmark-meta";
   const title = document.createElement("span");
   title.className = "bookmark-title";
-  title.textContent = "『" + currentContent.title + "』";
+  title.textContent = titleText;
   const author = document.createElement("span");
   author.className = "bookmark-author";
-  author.textContent = currentContent.author;
+  author.textContent = authorText;
   meta.appendChild(title);
   meta.appendChild(author);
   item.appendChild(meta);
@@ -956,7 +964,7 @@ function drawTextElement(context, element, baseRect) {
   context.restore();
 }
 
-function buildCanvasTextLines(context, text, maxWidth, maxLines) {
+function buildCanvasTextLines(context, text, maxWidth) {
   const chars = [...(text || "").replace(/\s+/g, " ").trim()];
   const lines = [];
   let line = "";
@@ -972,18 +980,10 @@ function buildCanvasTextLines(context, text, maxWidth, maxLines) {
   });
   if (line) lines.push(line);
 
-  if (lines.length <= maxLines) return lines;
-
-  const clamped = lines.slice(0, maxLines);
-  let lastLine = clamped[maxLines - 1] || "";
-  while (lastLine && context.measureText(lastLine + "…").width > maxWidth) {
-    lastLine = [...lastLine].slice(0, -1).join("");
-  }
-  clamped[maxLines - 1] = (lastLine || "").trimEnd() + "…";
-  return clamped;
+  return lines;
 }
 
-function drawClampedTextElement(context, element, baseRect, maxLines) {
+function drawWrappedTextElement(context, element, baseRect) {
   const rect = getRelativeRect(element, baseRect);
   const style = window.getComputedStyle(element);
   if (style.display === "none" || style.visibility === "hidden" || rect.width <= 0 || rect.height <= 0) {
@@ -994,12 +994,11 @@ function drawClampedTextElement(context, element, baseRect, maxLines) {
   const fontSize = parseFloat(style.fontSize) || 16;
   const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
   const opacity = parseFloat(style.opacity);
-  const lines = buildCanvasTextLines(context, element.textContent || "", rect.width, maxLines);
+  const lines = buildCanvasTextLines(context, element.textContent || "", rect.width);
 
   context.save();
   context.globalAlpha = Number.isNaN(opacity) ? 1 : opacity;
   lines.forEach((lineText, index) => {
-    if (index >= maxLines) return;
     context.fillText(lineText, rect.x, rect.y + lineHeight * index);
   });
   context.restore();
@@ -1196,7 +1195,7 @@ function drawBookmarkToCanvas(sheet) {
     });
 
     item.querySelectorAll(".bookmark-title, .bookmark-author").forEach(element => {
-      drawClampedTextElement(context, element, baseRect, 2);
+      drawWrappedTextElement(context, element, baseRect);
     });
 
     context.restore();

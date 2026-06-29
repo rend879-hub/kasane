@@ -1703,8 +1703,6 @@ body {
   min-width: 0;
 }
 
-.bookmark-title,
-.bookmark-author,
 .bookmark-color,
 .bookmark-tags,
 .bookmark-brand {
@@ -1714,36 +1712,99 @@ body {
 }
 
 .bookmark-title {
-  display: -webkit-box;
+  display: block;
+  max-width: 100%;
   font-family: var(--serif);
   font-size: 0.58rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--ink);
   letter-spacing: 0.03em;
   white-space: normal;
+  overflow: visible;
   overflow-wrap: anywhere;
+  text-overflow: clip;
   word-break: break-word;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 .bookmark-author {
-  display: -webkit-box;
+  display: block;
+  max-width: 100%;
   margin-top: 4px;
   font-family: var(--sans);
   font-size: 0.5rem;
   font-weight: 300;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--ink-mid);
   letter-spacing: 0.04em;
   white-space: normal;
+  overflow: visible;
   overflow-wrap: anywhere;
+  text-overflow: clip;
   word-break: break-word;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+}
+
+.bookmark-item--long-meta .bookmark-fragment {
+  margin-top: 8%;
+  font-size: 0.66rem;
+  line-height: 1.68;
+}
+
+.bookmark-item--long-meta .bookmark-image {
+  max-height: 18%;
+  margin-top: 8%;
+}
+
+.bookmark-item--long-meta .bookmark-rule {
+  margin: 9% 0 7%;
+}
+
+.bookmark-item--long-meta .bookmark-title {
+  font-size: 0.54rem;
+  line-height: 1.42;
+}
+
+.bookmark-item--long-meta .bookmark-author {
+  font-size: 0.47rem;
+  line-height: 1.42;
+}
+
+.bookmark-item--very-long-meta .bookmark-symbol {
+  min-height: 1.1em;
+  font-size: 0.86rem;
+}
+
+.bookmark-item--very-long-meta .bookmark-type {
+  margin-top: 8%;
+}
+
+.bookmark-item--very-long-meta .bookmark-fragment {
+  margin-top: 7%;
+  font-size: 0.6rem;
+  line-height: 1.58;
+}
+
+.bookmark-item--very-long-meta .bookmark-image {
+  max-height: 15%;
+  margin-top: 7%;
+}
+
+.bookmark-item--very-long-meta .bookmark-rule {
+  margin: 8% 0 6%;
+}
+
+.bookmark-item--very-long-meta .bookmark-title {
+  font-size: 0.5rem;
+  line-height: 1.38;
+}
+
+.bookmark-item--very-long-meta .bookmark-author {
+  font-size: 0.44rem;
+  line-height: 1.38;
+}
+
+.bookmark-item--very-long-meta .bookmark-tags {
+  padding-top: 8%;
 }
 
 .bookmark-tags {
