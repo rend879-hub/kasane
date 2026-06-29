@@ -8,7 +8,13 @@ let selectedColor  = null;
 let selectedTemplate = "post";
 let customSymbolText = "";
 let customTagText = "";
+let presenceSettings = {
+  name: "",
+  tags: [],
+  enabled: true
+};
 const preloadedImages = new Map();
+const PRESENCE_STORAGE_KEY = "kasanePresenceSettings";
 
 const SHARE_TEMPLATES = {
   post: {
@@ -248,6 +254,95 @@ function toggleTag(tag) {
     selectedTags = [...selectedTags, tag];
   }
   if (currentContent) renderTagOptions(currentContent.tags);
+}
+
+// ── Presence settings ─────────────────────────────────────────────────
+function getPresenceTagOptions() {
+  const tagSet = new Set();
+  KASANE_CONTENTS.forEach(content => {
+    (content.tags || []).forEach(tag => tagSet.add(tag));
+  });
+  return [...tagSet];
+}
+
+function renderPresenceTags() {
+  const container = document.getElementById("presence-tag-options");
+  if (!container) return;
+
+  container.innerHTML = "";
+  getPresenceTagOptions().forEach(tag => {
+    const isActive = presenceSettings.tags.includes(tag);
+    const btn = document.createElement("button");
+    btn.className = "tag-chip" + (isActive ? " tag-chip--active" : "");
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    btn.textContent = "#" + tag;
+    btn.addEventListener("click", () => togglePresenceTag(tag));
+    container.appendChild(btn);
+  });
+}
+
+function togglePresenceTag(tag) {
+  if (presenceSettings.tags.includes(tag)) {
+    presenceSettings.tags = presenceSettings.tags.filter(t => t !== tag);
+  } else {
+    presenceSettings.tags = [...presenceSettings.tags, tag];
+  }
+  renderPresenceTags();
+  clearPresenceSaveMessage();
+}
+
+function getStoredPresenceSettings() {
+  try {
+    const raw = localStorage.getItem(PRESENCE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      name: typeof parsed.name === "string" ? parsed.name.slice(0, 32) : "",
+      tags: Array.isArray(parsed.tags) ? parsed.tags.filter(tag => typeof tag === "string") : [],
+      enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : true
+    };
+  } catch (error) {
+    console.warn("気配設定を読み込めませんでした。", error);
+    return null;
+  }
+}
+
+function loadPresenceSettings() {
+  const stored = getStoredPresenceSettings();
+  if (stored) {
+    presenceSettings = stored;
+  }
+}
+
+function syncPresenceForm() {
+  const nameInput = document.getElementById("presence-name-input");
+  const enabledInput = document.getElementById("presence-enabled-input");
+
+  if (nameInput) nameInput.value = presenceSettings.name;
+  if (enabledInput) enabledInput.checked = presenceSettings.enabled;
+  renderPresenceTags();
+}
+
+function clearPresenceSaveMessage() {
+  const message = document.getElementById("presence-save-message");
+  if (message) message.textContent = "";
+}
+
+function savePresenceSettings() {
+  const nameInput = document.getElementById("presence-name-input");
+  const enabledInput = document.getElementById("presence-enabled-input");
+  const message = document.getElementById("presence-save-message");
+
+  presenceSettings = {
+    name: nameInput ? nameInput.value.trim().slice(0, 32) : "",
+    tags: [...presenceSettings.tags],
+    enabled: enabledInput ? enabledInput.checked : true
+  };
+
+  localStorage.setItem(PRESENCE_STORAGE_KEY, JSON.stringify(presenceSettings));
+
+  if (nameInput) nameInput.value = presenceSettings.name;
+  if (message) message.textContent = "保存しました";
 }
 
 // ── Color options ──────────────────────────────────────────────────────
@@ -849,6 +944,14 @@ function showSection(name) {
   document.querySelectorAll(".nav-about-btn").forEach(btn => {
     btn.classList.toggle("active", name === "about");
   });
+
+  document.querySelectorAll(".nav-presence-btn").forEach(btn => {
+    btn.classList.toggle("active", name === "presence");
+  });
+
+  if (name === "presence") {
+    syncPresenceForm();
+  }
 }
 
 // ── Filter / type switching ────────────────────────────────────────────
@@ -909,8 +1012,10 @@ async function nextFragment() {
 
 // ── Event wiring ───────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+  loadPresenceSettings();
   initGenerator();
   preloadPaintingImages();
+  syncPresenceForm();
 
   // type tabs
   document.querySelectorAll(".type-tab").forEach(btn => {
@@ -931,6 +1036,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => showSection("about"));
   });
 
+  document.querySelectorAll(".nav-presence-btn").forEach(btn => {
+    btn.addEventListener("click", () => showSection("presence"));
+  });
+
   // "別の断片を見る"
   document.getElementById("btn-next").addEventListener("click", nextFragment);
 
@@ -947,6 +1056,24 @@ document.addEventListener("DOMContentLoaded", () => {
       updateCustomSymbol(e.target.value);
     });
   }
+
+  const presenceNameInput = document.getElementById("presence-name-input");
+  if (presenceNameInput) {
+    presenceNameInput.addEventListener("input", e => {
+      presenceSettings.name = e.target.value.slice(0, 32);
+      clearPresenceSaveMessage();
+    });
+  }
+
+  const presenceEnabledInput = document.getElementById("presence-enabled-input");
+  if (presenceEnabledInput) {
+    presenceEnabledInput.addEventListener("change", e => {
+      presenceSettings.enabled = e.target.checked;
+      clearPresenceSaveMessage();
+    });
+  }
+
+  document.getElementById("btn-save-presence").addEventListener("click", savePresenceSettings);
 
   // "カードを生成する" → render preview then show
   document.getElementById("btn-preview").addEventListener("click", openPreview);
