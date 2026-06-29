@@ -30,11 +30,14 @@
 
       <div class="generator-intro" aria-labelledby="generator-title">
         <div>
-          <p class="generator-kicker">CARD MAKER</p>
-          <h1 class="generator-title" id="generator-title">今日の断片から、1枚のカードをつくる</h1>
-          <p class="generator-copy">古典・絵画・詩に、好きの気配とタグ、伝統色を静かに重ねます。</p>
+          <p class="generator-kicker">CARD / BOOKMARK MAKER</p>
+          <h1 class="generator-title" id="generator-title">今日の断片から、かたちをつくる</h1>
+          <p class="generator-copy">古典・絵画・詩に、好きの気配とタグ、伝統色を静かに重ねます。カードにも、しおりにもできます。</p>
         </div>
-        <button class="btn btn--primary generator-preview-btn" id="btn-preview-top">カードを生成する</button>
+        <div class="generator-output-actions">
+          <button class="btn btn--primary generator-preview-btn" id="btn-preview-top">カードを生成する</button>
+          <button class="btn btn--primary btn--secondary-primary generator-preview-btn" id="btn-bookmark-top">しおりを生成する</button>
+        </div>
       </div>
 
       <!-- Type tabs -->
@@ -108,8 +111,9 @@
       </div>
 
       <!-- Actions -->
-      <div class="actions">
+      <div class="actions generator-output-actions">
         <button class="btn btn--primary" id="btn-preview">カードを生成する</button>
+        <button class="btn btn--primary btn--secondary-primary" id="btn-bookmark">しおりを生成する</button>
       </div>
 
     </section>
@@ -131,7 +135,7 @@
 
       <div class="preview-actions">
         <button class="btn btn--primary" id="btn-save-image">画像を保存・共有</button>
-        <button class="btn btn--ghost" id="btn-generate-bookmark">しおりを生成</button>
+        <button class="btn btn--ghost" id="btn-generate-bookmark">この断片をしおりにもする</button>
         <button class="btn btn--ghost" id="btn-back">編集に戻る</button>
       </div>
       <p class="save-help">スマホでは共有メニューから「画像を保存」を選べます。</p>

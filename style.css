@@ -194,6 +194,17 @@ body {
   white-space: nowrap;
 }
 
+.generator-output-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.generator-output-actions .btn {
+  min-width: 150px;
+  text-align: center;
+}
+
 /* Type tabs */
 .type-tabs {
   display: flex;
@@ -581,6 +592,16 @@ body {
   border-color: var(--button-bg-hover);
 }
 
+.btn--secondary-primary {
+  background: #9B8F7F;
+  border-color: #9B8F7F;
+}
+
+.btn--secondary-primary:hover {
+  background: #8A7E70;
+  border-color: #8A7E70;
+}
+
 /* ═══════════════════════════════════════════════════
    PREVIEW SECTION
    ═══════════════════════════════════════════════════ */
@@ -911,6 +932,15 @@ body {
   }
 
   .generator-preview-btn {
+    width: 100%;
+  }
+
+  .generator-output-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .generator-output-actions .btn {
     width: 100%;
   }
 
