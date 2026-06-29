@@ -41,6 +41,7 @@ const SHARE_TEMPLATES = {
 };
 const BOOKMARK_EXPORT_WIDTH = 1800;
 const BOOKMARK_FILENAME = "kasane-bookmark-lsize.png";
+const BOOKMARK_TAG_LIMIT = 4;
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -747,7 +748,7 @@ function createBookmarkItem() {
 
   const fragment = document.createElement("p");
   fragment.className = "bookmark-fragment";
-  fragment.textContent = truncateText(currentContent.fragment, hasPaintingImage(currentContent) ? 34 : 46);
+  fragment.textContent = truncateText(currentContent.fragment, hasPaintingImage(currentContent) ? 28 : 38);
 
   item.appendChild(symbol);
   item.appendChild(type);
@@ -781,7 +782,7 @@ function createBookmarkItem() {
 
   const tags = document.createElement("div");
   tags.className = "bookmark-tags";
-  getShareCardTags().forEach(tag => {
+  getShareCardTags().slice(0, BOOKMARK_TAG_LIMIT).forEach(tag => {
     const tagEl = document.createElement("span");
     tagEl.className = "bookmark-tag";
     tagEl.textContent = "#" + tag;
