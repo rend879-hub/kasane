@@ -13,7 +13,10 @@
   <header class="site-header">
     <nav class="nav">
       <button class="nav-logo-btn" aria-label="ホームへ戻る">KASANE</button>
-      <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
+      <div class="nav-links" aria-label="ページ切り替え">
+        <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
+        <button class="nav-presence-btn" aria-label="気配の設定">気配</button>
+      </div>
     </nav>
   </header>
 
@@ -131,6 +134,45 @@
         <button class="btn btn--ghost" id="btn-back">編集に戻る</button>
       </div>
       <p class="save-help">スマホでは共有メニューから「画像を保存」を選べます。</p>
+
+    </section>
+
+    <!-- ─── PRESENCE ─── -->
+    <section id="section-presence" class="section section-presence" aria-labelledby="presence-title">
+
+      <p class="section-kicker">PRESENCE</p>
+      <h1 class="presence-title" id="presence-title">気配の設定</h1>
+
+      <div class="presence-intro">
+        <p>よく思い出す名前や言葉を、検索用のタグとして登録できます。</p>
+        <p>登録した気配に近い断片が、少しだけ出やすくなります。</p>
+      </div>
+
+      <div class="presence-panel">
+        <div class="control-block">
+          <label class="control-label" for="presence-name-input">名前や言葉</label>
+          <p class="control-help">例：青い人 / 夜明け / 声がきれい / 月みたいな人</p>
+          <input id="presence-name-input" class="presence-name-input" type="text"
+            placeholder="青い人 / 夜明け / 声がきれい"
+            maxlength="32"
+            autocomplete="off">
+        </div>
+
+        <div class="control-block">
+          <p class="control-label" id="presence-tags-label">関連するタグ</p>
+          <div id="presence-tag-options" class="tag-options" role="group" aria-labelledby="presence-tags-label"></div>
+        </div>
+
+        <label class="presence-toggle" for="presence-enabled-input">
+          <input id="presence-enabled-input" type="checkbox" checked>
+          <span>断片表示に少しだけ反映する</span>
+        </label>
+
+        <div class="presence-actions">
+          <button class="btn btn--primary" id="btn-save-presence">気配を保存する</button>
+          <p class="presence-save-message" id="presence-save-message" aria-live="polite"></p>
+        </div>
+      </div>
 
     </section>
 
