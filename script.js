@@ -15,6 +15,8 @@ let presenceSettings = {
 };
 const preloadedImages = new Map();
 const PRESENCE_STORAGE_KEY = "kasanePresenceSettings";
+const LIBRARY_STORAGE_KEY = "kasaneLibraryItems";
+const LIBRARY_MAX_ITEMS = 20;
 
 const SHARE_TEMPLATES = {
   post: {
@@ -145,6 +147,11 @@ function typeLabel(type) {
 function typeBadgeClass(type) {
   const map = { classic: "badge--classic", painting: "badge--painting", poem: "badge--poem" };
   return map[type] || "";
+}
+
+function templateLabel(template) {
+  const map = { post: "投稿用", header: "ヘッダー", icon: "アイコン", bookmark: "しおり" };
+  return map[template] || template;
 }
 
 function hasPaintingImage(content) {
@@ -586,6 +593,10 @@ function setSelectedTemplate(template) {
 }
 
 function openPreview() {
+  const bookmarkArea = document.getElementById("bookmark-preview-area");
+  if (bookmarkArea) {
+    bookmarkArea.hidden = true;
+  }
   renderPreview();
   showSection("preview");
 }
@@ -603,6 +614,254 @@ function openBookmarkPreview() {
   const bookmarkSheet = document.getElementById("bookmark-sheet-preview");
   if (bookmarkSheet) {
     bookmarkSheet.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// ── Library ───────────────────────────────────────────────────────────
+function getStoredLibraryItems() {
+  try {
+    const raw = localStorage.getItem(LIBRARY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(item => item && typeof item === "object") : [];
+  } catch (error) {
+    console.warn("保管庫を読み込めませんでした。", error);
+    return [];
+  }
+}
+
+function setStoredLibraryItems(items) {
+  const limitedItems = Array.isArray(items) ? items.slice(0, LIBRARY_MAX_ITEMS) : [];
+  localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(limitedItems));
+}
+
+function setLibrarySaveMessage(text) {
+  const message = document.getElementById("library-save-message");
+  if (message) message.textContent = text;
+}
+
+function createLibraryItem(template) {
+  if (!currentContent) return null;
+
+  const now = new Date();
+  const color = selectedColor || currentContent.defaultColor;
+
+  return {
+    id: "library_" + now.getTime(),
+    savedAt: now.toISOString(),
+    template: template,
+    contentId: currentContent.contentId,
+    type: currentContent.type,
+    title: currentContent.title,
+    author: currentContent.author,
+    fragment: currentContent.fragment,
+    shortComment: currentContent.shortComment,
+    tags: getShareCardTags(),
+    color: color,
+    symbol: getSelectedDisplaySymbol(),
+    imagePath: currentContent.imagePath || ""
+  };
+}
+
+function saveCurrentToLibrary(template) {
+  const item = createLibraryItem(template);
+  if (!item) {
+    setLibrarySaveMessage("残せる断片がまだありません。");
+    return;
+  }
+
+  const items = [item, ...getStoredLibraryItems()].slice(0, LIBRARY_MAX_ITEMS);
+  setStoredLibraryItems(items);
+  setLibrarySaveMessage("保管庫に残しました。");
+
+  if (currentSection === "library") {
+    renderLibraryItems();
+  }
+}
+
+function formatSavedAt(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function appendLibraryMeta(parent, label, value) {
+  if (!value) return;
+
+  const item = document.createElement("div");
+  item.className = "library-meta-item";
+
+  const term = document.createElement("dt");
+  term.textContent = label;
+
+  const description = document.createElement("dd");
+  description.textContent = value;
+
+  item.appendChild(term);
+  item.appendChild(description);
+  parent.appendChild(item);
+}
+
+function renderLibraryItems() {
+  const list = document.getElementById("library-list");
+  const empty = document.getElementById("library-empty");
+  if (!list || !empty) return;
+
+  const items = getStoredLibraryItems();
+  list.innerHTML = "";
+  empty.hidden = items.length > 0;
+
+  items.forEach(item => {
+    const article = document.createElement("article");
+    article.className = "library-card";
+
+    const top = document.createElement("div");
+    top.className = "library-card-top";
+
+    const labels = document.createElement("div");
+    labels.className = "library-labels";
+
+    const type = document.createElement("span");
+    type.className = "library-label";
+    type.textContent = typeLabel(item.type);
+    labels.appendChild(type);
+
+    const template = document.createElement("span");
+    template.className = "library-label library-label--template";
+    template.textContent = templateLabel(item.template);
+    labels.appendChild(template);
+
+    if (item.template === "bookmark") {
+      const bookmark = document.createElement("span");
+      bookmark.className = "library-label library-label--bookmark";
+      bookmark.textContent = "しおり";
+      labels.appendChild(bookmark);
+    }
+
+    const savedAt = document.createElement("time");
+    savedAt.className = "library-saved-at";
+    savedAt.dateTime = item.savedAt || "";
+    savedAt.textContent = formatSavedAt(item.savedAt);
+
+    top.appendChild(labels);
+    top.appendChild(savedAt);
+
+    const fragment = document.createElement("p");
+    fragment.className = "library-fragment";
+    fragment.textContent = item.fragment || "";
+
+    const title = document.createElement("p");
+    title.className = "library-work";
+    title.textContent = "『" + (item.title || "") + "』";
+
+    const author = document.createElement("p");
+    author.className = "library-author";
+    author.textContent = item.author || "";
+
+    const meta = document.createElement("dl");
+    meta.className = "library-meta";
+    appendLibraryMeta(meta, "色", item.color && item.color.name ? item.color.name : "");
+    appendLibraryMeta(meta, "重ねた日", formatSavedAt(item.savedAt));
+
+    const tags = document.createElement("div");
+    tags.className = "library-tags";
+    (Array.isArray(item.tags) ? item.tags : []).forEach(tag => {
+      const tagEl = document.createElement("span");
+      tagEl.className = "library-tag";
+      tagEl.textContent = "#" + tag;
+      tags.appendChild(tagEl);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "library-actions";
+
+    const openButton = document.createElement("button");
+    openButton.className = "btn btn--ghost";
+    openButton.type = "button";
+    openButton.dataset.libraryOpenId = item.id;
+    openButton.textContent = "この断片をひらく";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "library-delete-btn";
+    deleteButton.type = "button";
+    deleteButton.dataset.libraryDeleteId = item.id;
+    deleteButton.textContent = "削除";
+
+    actions.appendChild(openButton);
+    actions.appendChild(deleteButton);
+
+    article.appendChild(top);
+    article.appendChild(fragment);
+    article.appendChild(title);
+    article.appendChild(author);
+    if (tags.children.length) article.appendChild(tags);
+    article.appendChild(meta);
+    article.appendChild(actions);
+    list.appendChild(article);
+  });
+}
+
+function deleteLibraryItem(id) {
+  const items = getStoredLibraryItems().filter(item => item.id !== id);
+  setStoredLibraryItems(items);
+  renderLibraryItems();
+}
+
+function restoreLibraryItem(id) {
+  const item = getStoredLibraryItems().find(libraryItem => libraryItem.id === id);
+  if (!item) return;
+
+  const content = KASANE_CONTENTS.find(candidate => candidate.contentId === item.contentId);
+  if (!content) return;
+
+  const color = KASANE_COLORS.find(candidate => {
+    if (!item.color) return false;
+    return candidate.name === item.color.name || candidate.hex === item.color.hex;
+  }) || content.defaultColor;
+
+  const itemTags = Array.isArray(item.tags) ? item.tags.filter(tag => typeof tag === "string") : [];
+  const contentTags = Array.isArray(content.tags) ? content.tags : [];
+  const restoredSelectedTags = itemTags.filter(tag => contentTags.includes(tag));
+  const restoredCustomTag = itemTags.find(tag => !contentTags.includes(tag)) || "";
+
+  currentFilter = "all";
+  currentIndex = KASANE_CONTENTS.findIndex(candidate => candidate.contentId === content.contentId);
+  document.querySelectorAll(".type-tab").forEach(btn => {
+    const active = btn.dataset.type === "all";
+    btn.classList.toggle("type-tab--active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+
+  showContent(content);
+  selectedTags = restoredSelectedTags.length ? restoredSelectedTags : [...contentTags];
+  selectedColor = color;
+  customSymbolText = typeof item.symbol === "string" ? normalizeCustomSymbol(item.symbol) : "";
+  customTagText = normalizeCustomTag(restoredCustomTag);
+
+  const customTagInput = document.getElementById("custom-tag-input");
+  if (customTagInput) customTagInput.value = customTagText;
+
+  const customSymbolInput = document.getElementById("custom-symbol-input");
+  if (customSymbolInput) customSymbolInput.value = customSymbolText;
+
+  renderFragment(content);
+  renderLearnPanels(content);
+  renderTagOptions(content.tags);
+  renderColorOptions();
+
+  if (item.template === "bookmark") {
+    openBookmarkPreview();
+  } else {
+    const restoredTemplate = SHARE_TEMPLATES[item.template] ? item.template : "post";
+    setSelectedTemplate(restoredTemplate);
+    openPreview();
   }
 }
 
@@ -1316,8 +1575,17 @@ function showSection(name) {
     btn.classList.toggle("active", name === "presence");
   });
 
+  document.querySelectorAll(".nav-library-btn").forEach(btn => {
+    btn.classList.toggle("active", name === "library");
+  });
+
   if (name === "presence") {
     syncPresenceForm();
+  }
+
+  if (name === "library") {
+    renderLibraryItems();
+    setLibrarySaveMessage("");
   }
 }
 
@@ -1407,6 +1675,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => showSection("presence"));
   });
 
+  document.querySelectorAll(".nav-library-btn").forEach(btn => {
+    btn.addEventListener("click", () => showSection("library"));
+  });
+
   // "別の断片を見る"
   document.getElementById("btn-next").addEventListener("click", nextFragment);
 
@@ -1453,8 +1725,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "画像を保存・共有" → share or download preview card
   document.getElementById("btn-save-image").addEventListener("click", savePreviewImage);
+  document.getElementById("btn-save-library-card").addEventListener("click", () => {
+    saveCurrentToLibrary(selectedTemplate);
+  });
 
   // "しおりを生成" → render bookmark preview below the card
   document.getElementById("btn-generate-bookmark").addEventListener("click", renderBookmarkPreview);
   document.getElementById("btn-save-bookmark").addEventListener("click", saveBookmarkImage);
+  document.getElementById("btn-save-library-bookmark").addEventListener("click", () => {
+    saveCurrentToLibrary("bookmark");
+  });
+  document.getElementById("btn-back-bookmark").addEventListener("click", () => showSection("generator"));
+
+  const libraryList = document.getElementById("library-list");
+  if (libraryList) {
+    libraryList.addEventListener("click", event => {
+      const openButton = event.target.closest("[data-library-open-id]");
+      if (openButton) {
+        restoreLibraryItem(openButton.dataset.libraryOpenId);
+        return;
+      }
+
+      const deleteButton = event.target.closest("[data-library-delete-id]");
+      if (deleteButton) {
+        deleteLibraryItem(deleteButton.dataset.libraryDeleteId);
+      }
+    });
+  }
 });

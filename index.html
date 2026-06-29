@@ -14,6 +14,7 @@
     <nav class="nav">
       <button class="nav-logo-btn" aria-label="ホームへ戻る">KASANE</button>
       <div class="nav-links" aria-label="ページ切り替え">
+        <button class="nav-library-btn" aria-label="保管庫をひらく">保管庫</button>
         <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
         <button class="nav-presence-btn" aria-label="気配の設定">気配</button>
       </div>
@@ -135,9 +136,11 @@
 
       <div class="preview-actions">
         <button class="btn btn--primary" id="btn-save-image">画像を保存・共有</button>
+        <button class="btn btn--ghost" id="btn-save-library-card">保管庫に残す</button>
         <button class="btn btn--ghost" id="btn-generate-bookmark">この断片をしおりにもする</button>
         <button class="btn btn--ghost" id="btn-back">編集に戻る</button>
       </div>
+      <p class="library-save-message" id="library-save-message" aria-live="polite"></p>
       <p class="save-help">スマホでは共有メニューから「画像を保存」を選べます。</p>
 
       <div class="bookmark-preview-area" id="bookmark-preview-area" hidden>
@@ -145,9 +148,26 @@
         <div class="bookmark-sheet-preview" id="bookmark-sheet-preview" aria-label="しおりプレビュー"></div>
         <div class="preview-actions preview-actions--bookmark">
           <button class="btn btn--primary" id="btn-save-bookmark">しおり画像を保存</button>
+          <button class="btn btn--ghost" id="btn-save-library-bookmark">保管庫に残す</button>
+          <button class="btn btn--ghost" id="btn-back-bookmark">編集に戻る</button>
         </div>
         <p class="save-help save-help--bookmark">スマホでは共有メニューから「画像を保存」を選ぶと、しおり画像を保存できます。</p>
       </div>
+
+    </section>
+
+    <!-- ─── LIBRARY ─── -->
+    <section id="section-library" class="section section-library" aria-labelledby="library-title">
+
+      <p class="section-kicker">LIBRARY</p>
+      <h1 class="library-title" id="library-title">保管庫</h1>
+      <p class="library-copy">重ねた断片を、あとからもう一度ひらく場所です。</p>
+
+      <div class="library-empty" id="library-empty" hidden>
+        まだ保存された断片はありません。カードやしおりを作ったあと、ここに残せます。
+      </div>
+
+      <div class="library-list" id="library-list" aria-live="polite"></div>
 
     </section>
 
