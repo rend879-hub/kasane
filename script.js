@@ -39,6 +39,8 @@ const SHARE_TEMPLATES = {
     fragmentLimit: 32
   }
 };
+const BOOKMARK_EXPORT_WIDTH = 1800;
+const BOOKMARK_FILENAME = "kasane-bookmark-lsize.png";
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getFilteredContents(filter) {
@@ -720,6 +722,104 @@ function renderPreview() {
 
   container.appendChild(stripe);
   container.appendChild(inner);
+
+  const bookmarkArea = document.getElementById("bookmark-preview-area");
+  if (bookmarkArea && !bookmarkArea.hidden) {
+    renderBookmarkPreview();
+  }
+}
+
+// ── Bookmark preview render ───────────────────────────────────────────
+function createBookmarkItem() {
+  const color = selectedColor || currentContent.defaultColor;
+  const item = document.createElement("div");
+  item.className = "bookmark-item";
+  item.style.setProperty("--bookmark-accent", color.hex);
+
+  const symbol = document.createElement("span");
+  symbol.className = "bookmark-symbol";
+  symbol.textContent = getSelectedDisplaySymbol();
+  symbol.setAttribute("aria-hidden", "true");
+
+  const type = document.createElement("p");
+  type.className = "bookmark-type";
+  type.textContent = typeLabel(currentContent.type);
+
+  const fragment = document.createElement("p");
+  fragment.className = "bookmark-fragment";
+  fragment.textContent = truncateText(currentContent.fragment, hasPaintingImage(currentContent) ? 34 : 46);
+
+  item.appendChild(symbol);
+  item.appendChild(type);
+
+  if (hasPaintingImage(currentContent)) {
+    const img = document.createElement("img");
+    img.className = "bookmark-image";
+    img.src = currentContent.imagePath;
+    img.alt = "『" + currentContent.title + "』";
+    item.appendChild(img);
+  }
+
+  item.appendChild(fragment);
+
+  const rule = document.createElement("div");
+  rule.className = "bookmark-rule";
+  rule.setAttribute("aria-hidden", "true");
+  item.appendChild(rule);
+
+  const meta = document.createElement("div");
+  meta.className = "bookmark-meta";
+  const title = document.createElement("span");
+  title.className = "bookmark-title";
+  title.textContent = "『" + currentContent.title + "』";
+  const author = document.createElement("span");
+  author.className = "bookmark-author";
+  author.textContent = currentContent.author;
+  meta.appendChild(title);
+  meta.appendChild(author);
+  item.appendChild(meta);
+
+  const tags = document.createElement("div");
+  tags.className = "bookmark-tags";
+  getShareCardTags().forEach(tag => {
+    const tagEl = document.createElement("span");
+    tagEl.className = "bookmark-tag";
+    tagEl.textContent = "#" + tag;
+    tags.appendChild(tagEl);
+  });
+  item.appendChild(tags);
+
+  const colorRow = document.createElement("div");
+  colorRow.className = "bookmark-color";
+  const dot = document.createElement("span");
+  dot.className = "bookmark-color-dot";
+  dot.setAttribute("aria-hidden", "true");
+  const colorName = document.createElement("span");
+  colorName.className = "bookmark-color-name";
+  colorName.textContent = color.name;
+  colorRow.appendChild(dot);
+  colorRow.appendChild(colorName);
+  item.appendChild(colorRow);
+
+  const brand = document.createElement("p");
+  brand.className = "bookmark-brand";
+  brand.textContent = "KASANE";
+  item.appendChild(brand);
+
+  return item;
+}
+
+function renderBookmarkPreview() {
+  if (!currentContent) return;
+  const area = document.getElementById("bookmark-preview-area");
+  const sheet = document.getElementById("bookmark-sheet-preview");
+  if (!area || !sheet) return;
+
+  area.hidden = false;
+  sheet.innerHTML = "";
+  sheet.style.setProperty("--bookmark-accent", (selectedColor || currentContent.defaultColor).hex);
+  sheet.appendChild(createBookmarkItem());
+  sheet.appendChild(createBookmarkItem());
 }
 
 // ── Save preview as image ──────────────────────────────────────────────
@@ -960,6 +1060,94 @@ function drawPreviewToCanvas(card, scale) {
   return canvas;
 }
 
+function drawBookmarkToCanvas(sheet, scale) {
+  const baseRect = sheet.getBoundingClientRect();
+  const width = Math.ceil(baseRect.width);
+  const height = Math.ceil(baseRect.height);
+  const sheetStyle = window.getComputedStyle(sheet);
+  const canvas = document.createElement("canvas");
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+
+  const context = canvas.getContext("2d");
+  context.scale(scale, scale);
+
+  const sheetBackground = sheetStyle.backgroundColor === "rgba(0, 0, 0, 0)"
+    ? "#F8F4EA"
+    : sheetStyle.backgroundColor;
+  context.fillStyle = sheetBackground || "#F8F4EA";
+  context.fillRect(0, 0, width, height);
+
+  context.strokeStyle = "rgba(128, 116, 101, 0.24)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(width / 2, 0);
+  context.lineTo(width / 2, height);
+  context.stroke();
+
+  context.strokeStyle = sheetStyle.borderColor;
+  context.strokeRect(0.5, 0.5, width - 1, height - 1);
+
+  sheet.querySelectorAll(".bookmark-item").forEach(item => {
+    const itemRect = getRelativeRect(item, baseRect);
+    const itemStyle = window.getComputedStyle(item);
+    const accent = itemStyle.getPropertyValue("--bookmark-accent").trim() || (selectedColor || currentContent.defaultColor).hex;
+
+    context.fillStyle = itemStyle.backgroundColor;
+    context.fillRect(itemRect.x, itemRect.y, itemRect.width, itemRect.height);
+    context.strokeStyle = itemStyle.borderColor;
+    context.lineWidth = parseFloat(itemStyle.borderWidth) || 1;
+    context.strokeRect(itemRect.x + 0.5, itemRect.y + 0.5, itemRect.width - 1, itemRect.height - 1);
+
+    context.strokeStyle = "rgba(224, 221, 215, 0.82)";
+    context.strokeRect(itemRect.x + 5.5, itemRect.y + 5.5, itemRect.width - 11, itemRect.height - 11);
+
+    context.fillStyle = accent;
+    context.globalAlpha = 0.86;
+    context.fillRect(itemRect.x, itemRect.y, 4, itemRect.height);
+    context.globalAlpha = 1;
+
+    context.save();
+    context.beginPath();
+    context.rect(itemRect.x, itemRect.y, itemRect.width, itemRect.height);
+    context.clip();
+
+    const rule = item.querySelector(".bookmark-rule");
+    if (rule) {
+      const ruleRect = getRelativeRect(rule, baseRect);
+      context.fillStyle = window.getComputedStyle(rule).backgroundColor;
+      context.fillRect(ruleRect.x, ruleRect.y, ruleRect.width, ruleRect.height);
+    }
+
+    item.querySelectorAll(".bookmark-image").forEach(image => {
+      drawImageElement(context, image, baseRect);
+    });
+
+    const dot = item.querySelector(".bookmark-color-dot");
+    if (dot) {
+      const dotRect = getRelativeRect(dot, baseRect);
+      const dotStyle = window.getComputedStyle(dot);
+      context.beginPath();
+      context.arc(dotRect.x + dotRect.width / 2, dotRect.y + dotRect.height / 2, dotRect.width / 2, 0, Math.PI * 2);
+      context.fillStyle = dotStyle.backgroundColor;
+      context.fill();
+      context.strokeStyle = dotStyle.borderColor;
+      context.lineWidth = 1;
+      context.stroke();
+    }
+
+    item.querySelectorAll(
+      ".bookmark-symbol, .bookmark-type, .bookmark-fragment, .bookmark-title, .bookmark-author, .bookmark-tag, .bookmark-color-name, .bookmark-brand"
+    ).forEach(element => {
+      drawTextElement(context, element, baseRect);
+    });
+
+    context.restore();
+  });
+
+  return canvas;
+}
+
 async function savePreviewImage() {
   const card = document.getElementById("share-card-preview");
   const saveButton = document.getElementById("btn-save-image");
@@ -987,6 +1175,33 @@ async function savePreviewImage() {
   } catch (error) {
     console.error(error);
     window.alert("画像を保存・共有できませんでした。別のブラウザでお試しください。");
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = originalText;
+  }
+}
+
+async function saveBookmarkImage() {
+  const sheet = document.getElementById("bookmark-sheet-preview");
+  const saveButton = document.getElementById("btn-save-bookmark");
+  if (!sheet || !sheet.children.length) return;
+
+  const originalText = saveButton.textContent;
+  saveButton.disabled = true;
+  saveButton.textContent = "保存準備中";
+
+  try {
+    await waitForPreviewImages(sheet);
+    const sheetWidth = Math.ceil(sheet.getBoundingClientRect().width) || 1;
+    const scale = Math.max(2, BOOKMARK_EXPORT_WIDTH / sheetWidth);
+    const canvas = drawBookmarkToCanvas(sheet, scale);
+    const blob = await canvasToBlob(canvas);
+    const pngUrl = URL.createObjectURL(blob);
+    createImageDownload(pngUrl, BOOKMARK_FILENAME);
+    setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+  } catch (error) {
+    console.error(error);
+    window.alert("しおり画像を保存できませんでした。別のブラウザでお試しください。");
   } finally {
     saveButton.disabled = false;
     saveButton.textContent = originalText;
@@ -1162,4 +1377,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "画像を保存・共有" → share or download preview card
   document.getElementById("btn-save-image").addEventListener("click", savePreviewImage);
+
+  // "しおりを生成" → render bookmark preview below the card
+  document.getElementById("btn-generate-bookmark").addEventListener("click", renderBookmarkPreview);
+  document.getElementById("btn-save-bookmark").addEventListener("click", saveBookmarkImage);
 });
