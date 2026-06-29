@@ -590,6 +590,22 @@ function openPreview() {
   showSection("preview");
 }
 
+function openBookmarkPreview() {
+  renderPreview();
+  renderBookmarkPreview();
+  showSection("preview");
+
+  const bookmarkArea = document.getElementById("bookmark-preview-area");
+  if (bookmarkArea) {
+    bookmarkArea.hidden = false;
+  }
+
+  const bookmarkSheet = document.getElementById("bookmark-sheet-preview");
+  if (bookmarkSheet) {
+    bookmarkSheet.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 // ── Preview render ─────────────────────────────────────────────────────
 function renderPreview() {
   if (!currentContent) return;
@@ -1425,6 +1441,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // "カードを生成する" → render preview then show
   document.getElementById("btn-preview").addEventListener("click", openPreview);
   document.getElementById("btn-preview-top").addEventListener("click", openPreview);
+  document.getElementById("btn-bookmark").addEventListener("click", openBookmarkPreview);
+  document.getElementById("btn-bookmark-top").addEventListener("click", openBookmarkPreview);
 
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
