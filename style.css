@@ -1582,7 +1582,9 @@ body {
 }
 
 .bookmark-sheet-preview {
-  width: min(100%, 430px);
+  width: min(100%, 360px);
+  max-width: 360px;
+  height: auto;
   aspect-ratio: 89 / 127;
   margin: 0 auto;
   padding: 8% 7%;
