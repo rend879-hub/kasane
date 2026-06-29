@@ -15,8 +15,9 @@
       <button class="nav-logo-btn" aria-label="ホームへ戻る">KASANE</button>
       <div class="nav-links" aria-label="ページ切り替え">
         <button class="nav-library-btn" aria-label="保管庫をひらく">保管庫</button>
-        <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
         <button class="nav-presence-btn" aria-label="気配の設定">気配</button>
+        <button class="nav-color-finder-btn" aria-label="色から探す">色から探す</button>
+        <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
       </div>
     </nav>
   </header>
@@ -206,6 +207,29 @@
           <button class="btn btn--primary" id="btn-save-presence">気配を保存する</button>
           <p class="presence-save-message" id="presence-save-message" aria-live="polite"></p>
         </div>
+      </div>
+
+    </section>
+
+    <!-- ─── COLOR FINDER ─── -->
+    <section id="section-color-finder" class="section section-color-finder" aria-labelledby="color-finder-title">
+
+      <p class="section-kicker">COLOR</p>
+      <h1 class="color-finder-title" id="color-finder-title">色から探す</h1>
+
+      <div class="color-finder-intro">
+        <p>好きな色をひとつ選ぶと、その気配に近い伝統色と断片をひらきます。</p>
+        <p>正解を探すものではありません。</p>
+        <p>いま気になる色から、文化の入口をひとつ見つけるための小さな機能です。</p>
+      </div>
+
+      <div class="color-finder-panel">
+        <div class="control-block">
+          <p class="control-label" id="color-finder-options-label">好きな色</p>
+          <div id="color-finder-options" class="color-finder-options" role="group" aria-labelledby="color-finder-options-label"></div>
+        </div>
+
+        <div id="color-finder-result" class="color-finder-result" aria-live="polite"></div>
       </div>
 
     </section>
