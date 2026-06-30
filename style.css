@@ -1268,6 +1268,14 @@ body {
   letter-spacing: 0.06em;
   line-height: 1.6;
   text-align: center;
+  opacity: .72;
+  transition: opacity var(--transition), transform var(--transition), color var(--transition);
+}
+
+.library-save-message--active {
+  color: var(--accent);
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -3449,5 +3457,59 @@ body {
 
   .fragment-card--painting .fragment-image {
     max-height: 286px;
+  }
+}
+
+#btn-next {
+  min-height: 38px;
+  min-width: 156px;
+  padding: 9px 22px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: rgba(253, 252, 249, .58);
+  color: var(--ink-mid);
+  font-family: var(--sans);
+  font-size: .76rem;
+  font-weight: 300;
+  letter-spacing: .08em;
+  text-decoration: none;
+}
+
+#btn-next:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-soft);
+  color: var(--ink);
+}
+
+.kasane-sheet--attention {
+  animation: kasane-attention 700ms ease-out;
+}
+
+@keyframes kasane-attention {
+  0% {
+    background: rgba(253, 252, 249, .95);
+    box-shadow: 0 0 0 1px rgba(140, 123, 107, .18);
+  }
+
+  100% {
+    background: var(--bg);
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 480px) {
+  #btn-next {
+    min-width: min(180px, 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kasane-sheet--attention {
+    animation: none;
+  }
+
+  #btn-next,
+  .library-save-message {
+    transition: none;
   }
 }
