@@ -131,6 +131,17 @@ function dateSeed() {
   return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
 }
 
+function updateDateLabel() {
+  const label = document.getElementById("date-label");
+  if (!label) return;
+  const date = new Date();
+  const formatted = date.toLocaleDateString("ja-JP", {
+    month: "long",
+    day: "numeric"
+  });
+  label.textContent = "今日の断片　—　" + formatted;
+}
+
 function seedIndex(seed, len) {
   return ((seed * 1664525 + 1013904223) >>> 0) % len;
 }
@@ -369,8 +380,11 @@ function renderFragment(content) {
     imageEl.src = content.imagePath;
     imageEl.alt = "『" + content.title + "』";
     imageWrap.hidden = false;
-    fragmentEl.hidden = true;
-    fragmentEl.innerHTML = "";
+    fragmentEl.hidden = false;
+    fragmentEl.innerHTML = content.fragment
+      .split("\n")
+      .map(line => `<span>${line}</span>`)
+      .join("<br>");
   } else {
     imageEl.removeAttribute("src");
     imageEl.alt = "";
@@ -598,10 +612,15 @@ function renderColorFinderOptions() {
 
     const label = document.createElement("span");
     label.className = "color-finder-chip-label";
-    label.textContent = option.label;
+    label.textContent = option.colorName;
+
+    const note = document.createElement("span");
+    note.className = "color-finder-chip-note";
+    note.textContent = option.description.split("。")[0] + "。";
 
     btn.appendChild(swatch);
     btn.appendChild(label);
+    btn.appendChild(note);
     btn.addEventListener("click", () => selectColorFinderOption(option));
     container.appendChild(btn);
   });
@@ -622,7 +641,8 @@ function renderColorFinderResult(option) {
   }
 
   const color = getColorFinderColor(option);
-  const content = pickColorFinderContent(option);
+  const matches = getColorFinderMatches(option);
+  const contents = matches.length ? matches.slice(0, 5) : [pickColorFinderContent(option)];
 
   const header = document.createElement("div");
   header.className = "color-finder-result-header";
@@ -659,36 +679,38 @@ function renderColorFinderResult(option) {
     tagList.appendChild(tagEl);
   });
 
-  const fragment = document.createElement("div");
-  fragment.className = "color-finder-fragment";
+  const fragmentList = document.createElement("div");
+  fragmentList.className = "color-finder-fragments";
 
   const fragmentLabel = document.createElement("p");
   fragmentLabel.className = "color-finder-fragment-label";
-  fragmentLabel.textContent = "気配に近い断片";
+  fragmentLabel.textContent = "近い断片";
+  fragmentList.appendChild(fragmentLabel);
 
-  const fragmentText = document.createElement("p");
-  fragmentText.className = "color-finder-fragment-text";
-  fragmentText.textContent = content.fragment;
+  contents.forEach(content => {
+    const fragment = document.createElement("button");
+    fragment.className = "color-finder-fragment";
+    fragment.type = "button";
+    fragment.style.setProperty("--mini-accent", (content.defaultColor && content.defaultColor.hex) || color.hex);
 
-  const fragmentMeta = document.createElement("p");
-  fragmentMeta.className = "color-finder-fragment-meta";
-  fragmentMeta.textContent = "『" + content.title + "』 " + content.author;
+    const fragmentText = document.createElement("span");
+    fragmentText.className = "color-finder-fragment-text";
+    fragmentText.textContent = content.fragment;
 
-  fragment.appendChild(fragmentLabel);
-  fragment.appendChild(fragmentText);
-  fragment.appendChild(fragmentMeta);
+    const fragmentMeta = document.createElement("span");
+    fragmentMeta.className = "color-finder-fragment-meta";
+    fragmentMeta.textContent = typeLabel(content.type) + " ・ 『" + content.title + "』 " + content.author;
 
-  const action = document.createElement("button");
-  action.className = "btn btn--primary color-finder-action";
-  action.type = "button";
-  action.textContent = "この色でカードを作る";
-  action.addEventListener("click", () => applyColorFinderOption(option));
+    fragment.appendChild(fragmentText);
+    fragment.appendChild(fragmentMeta);
+    fragment.addEventListener("click", () => applyColorFinderOption(option, content));
+    fragmentList.appendChild(fragment);
+  });
 
   container.appendChild(header);
   container.appendChild(description);
   container.appendChild(tagList);
-  container.appendChild(fragment);
-  container.appendChild(action);
+  container.appendChild(fragmentList);
 }
 
 function selectColorFinderOption(option) {
@@ -705,8 +727,8 @@ function setTypeTabState(filter) {
   });
 }
 
-function applyColorFinderOption(option) {
-  const content = pickColorFinderContent(option);
+function applyColorFinderOption(option, selectedContent) {
+  const content = selectedContent || pickColorFinderContent(option);
   const color = getColorFinderColor(option);
   const mergedTags = [...new Set([...(option.tags || []), ...(content.tags || [])])];
 
@@ -722,6 +744,7 @@ function applyColorFinderOption(option) {
   renderTagOptions(mergedTags);
   renderColorOptions();
   showSection("generator");
+  openKasanePanel();
 }
 
 // ── Custom symbol ──────────────────────────────────────────────────────
@@ -973,6 +996,7 @@ function renderLibraryItems() {
   items.forEach(item => {
     const article = document.createElement("article");
     article.className = "library-card";
+    article.style.setProperty("--li", item.color && item.color.hex ? item.color.hex : "var(--accent-soft)");
 
     const top = document.createElement("div");
     top.className = "library-card-top";
@@ -1004,6 +1028,11 @@ function renderLibraryItems() {
 
     top.appendChild(labels);
     top.appendChild(savedAt);
+
+    const colorDot = document.createElement("span");
+    colorDot.className = "library-color-dot";
+    colorDot.style.background = item.color && item.color.hex ? item.color.hex : "var(--accent-soft)";
+    colorDot.setAttribute("aria-hidden", "true");
 
     const fragment = document.createElement("p");
     fragment.className = "library-fragment";
@@ -1050,6 +1079,7 @@ function renderLibraryItems() {
     actions.appendChild(deleteButton);
 
     article.appendChild(top);
+    article.appendChild(colorDot);
     article.appendChild(fragment);
     article.appendChild(title);
     article.appendChild(author);
@@ -1463,6 +1493,26 @@ function drawTextElement(context, element, baseRect) {
   context.save();
   context.globalAlpha = Number.isNaN(opacity) ? 1 : opacity;
 
+  if ((style.writingMode || "").startsWith("vertical")) {
+    const chars = [...text.replace(/\s+/g, " ").trim()];
+    const charStep = lineHeight;
+    let x = rect.x + Math.max(0, (rect.width - fontSize) / 2);
+    let y = rect.y;
+
+    chars.forEach(char => {
+      if (y + fontSize > rect.y + rect.height + 0.5) {
+        y = rect.y;
+        x -= fontSize * 1.6;
+      }
+      if (x + fontSize >= rect.x - 0.5) {
+        context.fillText(char, x, y);
+      }
+      y += charStep;
+    });
+    context.restore();
+    return;
+  }
+
   if (!shouldWrap) {
     context.fillText(text, rect.x, rect.y);
     context.restore();
@@ -1805,6 +1855,28 @@ function showContent(content) {
   renderColorOptions();
 }
 
+function openKasanePanel() {
+  const panel = document.getElementById("kasane-panel");
+  if (!panel) return;
+  panel.hidden = false;
+  panel.classList.add("kasane-sheet--open");
+}
+
+function closeKasanePanel() {
+  const panel = document.getElementById("kasane-panel");
+  if (!panel) return;
+  panel.hidden = true;
+  panel.classList.remove("kasane-sheet--open");
+}
+
+function openLearnDetails() {
+  const panel = document.getElementById("learn-panel-generator");
+  const details = panel ? panel.querySelector("details") : null;
+  if (!details) return;
+  details.open = true;
+  details.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 // ── Initialize ─────────────────────────────────────────────────────────
 function initGenerator() {
   const filtered = getFilteredContents(currentFilter);
@@ -1818,6 +1890,16 @@ function showSection(name) {
   currentSection = name;
   document.querySelectorAll(".section").forEach(s => s.classList.remove("section--active"));
   document.getElementById("section-" + name).classList.add("section--active");
+
+  document.querySelectorAll(".bottom-nav-btn").forEach(btn => {
+    const target = btn.dataset.nav;
+    const active = target === name || (target === "generator" && name === "color-finder");
+    btn.classList.toggle("active", active);
+  });
+
+  document.querySelectorAll(".nav-logo-btn").forEach(btn => {
+    btn.classList.toggle("active", name === "generator" || name === "color-finder");
+  });
 
   document.querySelectorAll(".nav-about-btn").forEach(btn => {
     btn.classList.toggle("active", name === "about");
@@ -1847,6 +1929,10 @@ function showSection(name) {
   if (name === "color-finder") {
     renderColorFinderOptions();
     renderColorFinderResult(selectedColorFinderOption);
+  }
+
+  if (name !== "generator") {
+    closeKasanePanel();
   }
 }
 
@@ -1905,6 +1991,7 @@ async function nextFragment() {
 // ── Event wiring ───────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   loadPresenceSettings();
+  updateDateLabel();
   initGenerator();
   preloadPaintingImages();
   syncPresenceForm();
@@ -1945,6 +2032,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // "別の断片を見る"
   document.getElementById("btn-next").addEventListener("click", nextFragment);
 
+  const openKasaneButton = document.getElementById("btn-open-kasane");
+  if (openKasaneButton) {
+    openKasaneButton.addEventListener("click", openKasanePanel);
+  }
+
+  const closeKasaneButton = document.getElementById("btn-close-kasane");
+  if (closeKasaneButton) {
+    closeKasaneButton.addEventListener("click", closeKasanePanel);
+  }
+
+  const openLearnButton = document.getElementById("btn-open-learn");
+  if (openLearnButton) {
+    openLearnButton.addEventListener("click", openLearnDetails);
+  }
+
   const customTagInput = document.getElementById("custom-tag-input");
   if (customTagInput) {
     customTagInput.addEventListener("input", e => {
@@ -1979,9 +2081,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "カードを生成する" → render preview then show
   document.getElementById("btn-preview").addEventListener("click", openPreview);
-  document.getElementById("btn-preview-top").addEventListener("click", openPreview);
   document.getElementById("btn-bookmark").addEventListener("click", openBookmarkPreview);
-  document.getElementById("btn-bookmark-top").addEventListener("click", openBookmarkPreview);
 
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
