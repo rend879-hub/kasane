@@ -1683,22 +1683,6 @@ body {
   display: contents;
 }
 
-.seal {
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--accent);
-  border-radius: 3px;
-  color: var(--accent);
-  font-family: var(--serif);
-  font-size: .5rem;
-  line-height: 1.05;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  writing-mode: vertical-rl;
-  opacity: .5;
-}
-
 .fragment-comment {
   width: min(100%, 320px);
   margin: 4px auto 0;
@@ -3273,4 +3257,197 @@ body {
 .color-finder-fragments .color-finder-fragment {
   width: 100%;
   margin-top: 12px;
+}
+
+/* Discovery mobile polish */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  overscroll-behavior-x: none;
+}
+
+.app-shell {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.page-wrap,
+.section,
+.fragment-card,
+.fragment-stage,
+.fragment-main,
+.fragment-side,
+.home-foot,
+.home-chips,
+.type-tabs,
+.link-row,
+.color-finder-options,
+.library-list {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.bottom-nav {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  transform: none;
+  max-width: 100%;
+}
+
+.section-generator {
+  padding-top: 6px;
+}
+
+.date-line {
+  margin-top: 4px;
+}
+
+.section-generator .fragment-card {
+  margin-top: 10px;
+}
+
+.section-generator .fragment-card--textual .fragment-stage {
+  min-height: 350px;
+  padding-top: 4px;
+  gap: 16px;
+}
+
+.section-generator .fragment-card--textual .fragment-text {
+  min-height: 220px;
+  max-height: 315px;
+}
+
+.section-generator .fragment-card--textual .fragment-side {
+  gap: 10px;
+}
+
+.section-generator .fragment-card--textual .fragment-title {
+  max-height: 128px;
+}
+
+.fragment-comment {
+  margin-top: 0;
+}
+
+.color-pill {
+  margin-top: 8px;
+}
+
+.home-foot {
+  padding-top: 10px;
+}
+
+.home-chips,
+.type-tabs {
+  margin-bottom: 12px;
+}
+
+.link-row {
+  justify-content: center;
+}
+
+.fragment-card--painting .fragment-stage {
+  min-height: auto;
+  display: block;
+  padding: 4px 0 0;
+}
+
+.fragment-card--painting .fragment-main {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.section-generator .fragment-card--painting .badge {
+  writing-mode: horizontal-tb;
+  align-self: flex-start;
+  padding: 3px 10px;
+  margin: 0;
+  letter-spacing: .14em;
+}
+
+.fragment-card--painting .fragment-image-wrap {
+  width: 100%;
+  max-height: none;
+  margin: 0;
+  opacity: 1;
+}
+
+.fragment-card--painting .fragment-image {
+  width: 100%;
+  max-height: 292px;
+  object-fit: contain;
+  background: #F8F6F1;
+  filter: saturate(.86) contrast(.96);
+}
+
+.section-generator .fragment-card--painting .fragment-text {
+  writing-mode: horizontal-tb;
+  min-height: auto;
+  max-height: none;
+  font-size: .9rem;
+  line-height: 1.8;
+  letter-spacing: .05em;
+  text-align: center;
+  color: var(--ink-mid);
+}
+
+.fragment-card--painting .fragment-side {
+  margin-top: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.section-generator .fragment-card--painting .fragment-title,
+.section-generator .fragment-card--painting .fragment-author {
+  writing-mode: horizontal-tb;
+  max-height: none;
+  letter-spacing: .06em;
+}
+
+.fragment-card--painting .fragment-comment {
+  text-align: left;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fragment-card--painting .color-pill {
+  justify-content: flex-start;
+}
+
+@media (max-width: 480px) {
+  .page-wrap {
+    padding-inline: 22px;
+  }
+
+  .site-header {
+    height: 52px;
+    padding-top: 10px;
+    padding-bottom: 4px;
+  }
+
+  .section-generator {
+    padding-top: 4px;
+  }
+
+  .section-generator .fragment-card--textual .fragment-stage {
+    min-height: 332px;
+  }
+
+  .section-generator .fragment-card--textual .fragment-text {
+    min-height: 205px;
+    max-height: 300px;
+  }
+
+  .fragment-card--painting .fragment-image {
+    max-height: 286px;
+  }
 }

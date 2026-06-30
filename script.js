@@ -365,6 +365,8 @@ function renderLearnPanels(content) {
 
 // ── Render fragment card ───────────────────────────────────────────────
 function renderFragment(content) {
+  const card      = document.querySelector(".fragment-card");
+  const stage     = document.querySelector(".fragment-stage");
   const badge     = document.getElementById("fragment-badge");
   const imageWrap = document.getElementById("fragment-image-wrap");
   const imageEl   = document.getElementById("fragment-image");
@@ -372,6 +374,17 @@ function renderFragment(content) {
   const titleEl   = document.getElementById("fragment-title");
   const authorEl  = document.getElementById("fragment-author");
   const commentEl = document.getElementById("fragment-comment");
+  const isPainting = content.type === "painting";
+
+  if (card) {
+    card.classList.toggle("fragment-card--painting", isPainting);
+    card.classList.toggle("fragment-card--textual", !isPainting);
+  }
+
+  if (stage) {
+    stage.classList.toggle("fragment-stage--painting", isPainting);
+    stage.classList.toggle("fragment-stage--textual", !isPainting);
+  }
 
   badge.textContent = typeLabel(content.type);
   badge.className   = "badge " + typeBadgeClass(content.type);
@@ -1869,14 +1882,6 @@ function closeKasanePanel() {
   panel.classList.remove("kasane-sheet--open");
 }
 
-function openLearnDetails() {
-  const panel = document.getElementById("learn-panel-generator");
-  const details = panel ? panel.querySelector("details") : null;
-  if (!details) return;
-  details.open = true;
-  details.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 // ── Initialize ─────────────────────────────────────────────────────────
 function initGenerator() {
   const filtered = getFilteredContents(currentFilter);
@@ -2040,11 +2045,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeKasaneButton = document.getElementById("btn-close-kasane");
   if (closeKasaneButton) {
     closeKasaneButton.addEventListener("click", closeKasanePanel);
-  }
-
-  const openLearnButton = document.getElementById("btn-open-learn");
-  if (openLearnButton) {
-    openLearnButton.addEventListener("click", openLearnDetails);
   }
 
   const customTagInput = document.getElementById("custom-tag-input");
