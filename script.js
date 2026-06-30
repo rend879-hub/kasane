@@ -925,7 +925,20 @@ function setStoredLibraryItems(items) {
 
 function setLibrarySaveMessage(text) {
   const message = document.getElementById("library-save-message");
-  if (message) message.textContent = text;
+  if (!message) return;
+
+  message.textContent = text;
+  message.classList.remove("library-save-message--active");
+
+  if (text) {
+    requestAnimationFrame(() => {
+      message.classList.add("library-save-message--active");
+    });
+
+    window.setTimeout(() => {
+      message.classList.remove("library-save-message--active");
+    }, 2200);
+  }
 }
 
 function createLibraryItem(template) {
@@ -960,7 +973,7 @@ function saveCurrentToLibrary(template) {
 
   const items = [item, ...getStoredLibraryItems()].slice(0, LIBRARY_MAX_ITEMS);
   setStoredLibraryItems(items);
-  setLibrarySaveMessage("保管庫に残しました。");
+  setLibrarySaveMessage("保管庫に残しました。あとで見返せます。");
 
   if (currentSection === "library") {
     renderLibraryItems();
@@ -1873,6 +1886,19 @@ function openKasanePanel() {
   if (!panel) return;
   panel.hidden = false;
   panel.classList.add("kasane-sheet--open");
+  panel.classList.remove("kasane-sheet--attention");
+
+  requestAnimationFrame(() => {
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+    panel.classList.add("kasane-sheet--attention");
+  });
+
+  window.setTimeout(() => {
+    panel.classList.remove("kasane-sheet--attention");
+  }, 700);
 }
 
 function closeKasanePanel() {
