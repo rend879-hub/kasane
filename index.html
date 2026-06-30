@@ -5,272 +5,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KASANE — 感性のアーカイブ</title>
   <meta name="description" content="古典、絵画、詩の断片に、自分だけの意味を重ねていく。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ═══════════════ HEADER ═══════════════ -->
-  <header class="site-header">
-    <nav class="nav">
-      <button class="nav-logo-btn" aria-label="ホームへ戻る">KASANE</button>
-      <div class="nav-links" aria-label="ページ切り替え">
-        <button class="nav-library-btn" aria-label="保管庫をひらく">保管庫</button>
-        <button class="nav-presence-btn" aria-label="気配の設定">気配</button>
-        <button class="nav-color-finder-btn" aria-label="色から探す">色から探す</button>
-        <button class="nav-about-btn" aria-label="このプロダクトについて">About</button>
-      </div>
+  <div class="app-shell">
+    <header class="site-header">
+      <button class="nav-logo-btn logo" aria-label="今日の断片へ戻る">KASANE</button>
+      <button class="head-link nav-color-finder-btn" type="button">色から探す</button>
+    </header>
+
+    <main class="page-wrap">
+      <section id="section-generator" class="section section-generator section--active" aria-label="今日の断片">
+        <div class="date-line" id="date-label" aria-live="polite">今日の断片</div>
+
+        <article class="fragment-card" aria-label="文化断片">
+          <div class="fragment-stage">
+            <div class="fragment-main">
+              <span class="badge" id="fragment-badge">古典</span>
+              <figure class="fragment-image-wrap" id="fragment-image-wrap" hidden>
+                <img class="fragment-image" id="fragment-image" alt="">
+              </figure>
+              <div class="fragment-text" id="fragment-text" lang="ja"></div>
+            </div>
+
+            <div class="fragment-side">
+              <span class="fragment-title" id="fragment-title"></span>
+              <span class="fragment-author" id="fragment-author"></span>
+              <span class="seal" aria-hidden="true">かさ</span>
+            </div>
+          </div>
+
+          <p class="fragment-comment" id="fragment-comment"></p>
+          <div class="color-pill">
+            <span class="color-dot" id="color-dot" aria-hidden="true"></span>
+            <span class="color-name" id="color-name"></span>
+          </div>
+        </article>
+
+        <div class="home-foot">
+          <div class="type-tabs home-chips" role="group" aria-label="種別">
+            <button class="type-tab type-tab--active" data-type="all" aria-pressed="true">すべて</button>
+            <button class="type-tab" data-type="classic" aria-pressed="false">古典</button>
+            <button class="type-tab" data-type="painting" aria-pressed="false">絵画</button>
+            <button class="type-tab" data-type="poem" aria-pressed="false">詩</button>
+          </div>
+
+          <div class="home-actions">
+            <button class="btn-line" id="btn-open-kasane" type="button">かさねる</button>
+            <div class="link-row">
+              <button class="link" id="btn-next" type="button">別の断片を見る</button>
+              <button class="link" id="btn-open-learn" type="button">この断片について</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="learn-panel" id="learn-panel-generator" aria-live="polite"></div>
+
+        <section class="kasane-sheet" id="kasane-panel" aria-label="かさねる設定" hidden>
+          <div class="sheet-bar">
+            <p class="sheet-title">かさねる</p>
+            <button class="sheet-close" id="btn-close-kasane" type="button" aria-label="かさねる設定を閉じる">×</button>
+          </div>
+
+          <div class="kasane-controls">
+            <div class="control-block">
+              <p class="control-label" id="tag-label">タグを重ねる</p>
+              <div id="tag-options" class="tag-options" role="group" aria-labelledby="tag-label"></div>
+
+              <label class="control-label control-label--sub" for="custom-tag-input">自分でタグを追加する</label>
+              <input id="custom-tag-input" class="custom-tag-input" type="text"
+                placeholder="例：夜明けの人 / 青い孤独 / 声がきれい"
+                maxlength="24"
+                autocomplete="off">
+            </div>
+
+            <div class="control-block">
+              <p class="control-label" id="color-label">色を添える</p>
+              <div id="color-options" class="color-options" role="group" aria-labelledby="color-label"></div>
+            </div>
+
+            <div class="control-block">
+              <label class="control-label" for="custom-symbol-input">記号を添える</label>
+              <input id="custom-symbol-input" class="custom-symbol-input" type="text"
+                placeholder="例：月 / 花 / しるし"
+                maxlength="4"
+                autocomplete="off">
+            </div>
+          </div>
+
+          <div class="sheet-foot">
+            <button class="btn btn--ghost" id="btn-bookmark" type="button">しおりを生成する</button>
+            <button class="btn btn--primary" id="btn-preview" type="button">カードを生成する</button>
+          </div>
+        </section>
+      </section>
+
+      <section id="section-preview" class="section section-preview" aria-label="カードプレビュー">
+        <p class="section-kicker">PREVIEW</p>
+        <h1 class="screen-title">カードプレビュー</h1>
+
+        <div class="template-selector" role="group" aria-label="カード用途">
+          <button class="template-option template-option--active" data-template="post" aria-pressed="true">投稿用</button>
+          <button class="template-option" data-template="header" aria-pressed="false">ヘッダー</button>
+          <button class="template-option" data-template="icon" aria-pressed="false">アイコン</button>
+        </div>
+
+        <div class="share-card-preview" id="share-card-preview" aria-label="シェアカードプレビュー"></div>
+        <div class="learn-panel learn-panel--preview" id="learn-panel-preview" aria-live="polite"></div>
+
+        <div class="preview-actions">
+          <button class="btn btn--primary" id="btn-save-image" type="button">画像を保存・共有</button>
+          <button class="btn btn--ghost" id="btn-save-library-card" type="button">保管庫に残す</button>
+          <button class="btn btn--ghost" id="btn-generate-bookmark" type="button">この断片をしおりにもする</button>
+          <button class="btn btn--ghost" id="btn-back" type="button">編集に戻る</button>
+        </div>
+        <p class="library-save-message" id="library-save-message" aria-live="polite"></p>
+        <p class="save-help">スマホでは共有メニューから「画像を保存」を選べます。</p>
+
+        <div class="bookmark-preview-area" id="bookmark-preview-area" hidden>
+          <p class="bookmark-preview-title">しおりプレビュー</p>
+          <div class="bookmark-sheet-preview" id="bookmark-sheet-preview" aria-label="しおりプレビュー"></div>
+          <div class="preview-actions preview-actions--bookmark">
+            <button class="btn btn--primary" id="btn-save-bookmark" type="button">しおり画像を保存</button>
+            <button class="btn btn--ghost" id="btn-save-library-bookmark" type="button">保管庫に残す</button>
+            <button class="btn btn--ghost" id="btn-back-bookmark" type="button">編集に戻る</button>
+          </div>
+          <p class="save-help save-help--bookmark">L判2枚並べのPNGとして保存できます。</p>
+        </div>
+      </section>
+
+      <section id="section-color-finder" class="section section-color-finder" aria-labelledby="color-finder-title">
+        <p class="section-kicker">COLOR</p>
+        <h1 class="screen-title" id="color-finder-title">色から探す</h1>
+        <p class="screen-copy">いま気になる色から、文化の入口をひとつ。正解を探すものではありません。</p>
+
+        <div class="color-finder-panel">
+          <div class="control-block">
+            <p class="control-label" id="color-finder-options-label">伝統色</p>
+            <div id="color-finder-options" class="color-finder-options" role="group" aria-labelledby="color-finder-options-label"></div>
+          </div>
+
+          <div id="color-finder-result" class="color-finder-result" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="section-library" class="section section-library" aria-labelledby="library-title">
+        <p class="section-kicker">LIBRARY</p>
+        <h1 class="screen-title" id="library-title">保管庫</h1>
+        <p class="screen-copy">重ねた断片を、あとからもう一度ひらく場所です。</p>
+
+        <div class="library-filter-chips" aria-hidden="true">
+          <span class="chip chip--active">最近</span>
+          <span class="chip">色から</span>
+          <span class="chip">タグから</span>
+          <span class="chip">種別</span>
+          <span class="chip">しおり</span>
+        </div>
+
+        <div class="library-empty" id="library-empty" hidden>
+          まだ保存された断片はありません。カードやしおりを作ったあと、ここに残せます。
+        </div>
+        <div class="library-list" id="library-list" aria-live="polite"></div>
+      </section>
+
+      <section id="section-presence" class="section section-presence" aria-labelledby="presence-title">
+        <p class="section-kicker">PRESENCE</p>
+        <h1 class="screen-title" id="presence-title">気配の設定</h1>
+        <p class="presence-poem">少しだけ、出会いに<br>重力を。</p>
+
+        <div class="presence-intro">
+          <p>よく思い出す名前や言葉を、検索用のタグとして登録できます。</p>
+          <p>登録した気配に近い断片が、少しだけ出やすくなります。</p>
+        </div>
+
+        <div class="presence-panel">
+          <div class="control-block">
+            <label class="control-label" for="presence-name-input">名前や言葉</label>
+            <p class="control-help">例：青い人 / 夜明け / 声がきれい / 月みたいな人</p>
+            <input id="presence-name-input" class="presence-name-input" type="text"
+              placeholder="青い人 / 夜明け / 声がきれい"
+              maxlength="32"
+              autocomplete="off">
+          </div>
+
+          <div class="control-block">
+            <p class="control-label" id="presence-tags-label">関連するタグ</p>
+            <div id="presence-tag-options" class="tag-options" role="group" aria-labelledby="presence-tags-label"></div>
+          </div>
+
+          <label class="presence-toggle" for="presence-enabled-input">
+            <input id="presence-enabled-input" type="checkbox" checked>
+            <span>断片表示に少しだけ反映する</span>
+          </label>
+
+          <div class="presence-actions">
+            <button class="btn btn--primary" id="btn-save-presence" type="button">気配を保存する</button>
+            <p class="presence-save-message" id="presence-save-message" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-about" class="section section-about" aria-label="このプロダクトについて">
+        <p class="section-kicker">ABOUT</p>
+        <p class="about-logo">KASANE</p>
+        <div class="about-rule" aria-hidden="true"></div>
+
+        <div class="about-body">
+          <p>KASANE は、好きの気配を文化の中に見つけるための小さなノートです。</p>
+          <p>古典、絵画、詩に、自分だけの意味を重ねていく。<br>
+             名前を出さなくてもいい。<br>
+             正しく説明できなくてもいい。</p>
+          <p>感じた断片に、タグや色や気配を重ねて、一枚のカードとして残すことができます。</p>
+        </div>
+
+        <p class="about-note">
+          好きは、文化へひらく小さな入口です。<br>
+          古典・絵画・詩・色・言葉の中に、自分だけの響きを見つけていく。<br>
+          KASANEは、その静かな旅のための道具です。
+        </p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="主要画面">
+      <button class="bottom-nav-btn nav-logo-btn active" type="button" data-nav="generator">
+        <span class="jp">発見</span><span class="en">DISCOVER</span>
+      </button>
+      <button class="bottom-nav-btn nav-library-btn" type="button" data-nav="library">
+        <span class="jp">保管庫</span><span class="en">LIBRARY</span>
+      </button>
+      <button class="bottom-nav-btn nav-presence-btn" type="button" data-nav="presence">
+        <span class="jp">気配</span><span class="en">PRESENCE</span>
+      </button>
+      <button class="bottom-nav-btn nav-about-btn" type="button" data-nav="about">
+        <span class="jp">About</span><span class="en">ABOUT</span>
+      </button>
     </nav>
-  </header>
+  </div>
 
-  <!-- ═══════════════ MAIN ═══════════════ -->
-  <main class="page-wrap">
-
-    <!-- ─── GENERATOR ─── -->
-    <section id="section-generator" class="section section-generator section--active" aria-label="カード生成">
-
-      <div class="date-line" id="date-label" aria-live="polite">今日の断片</div>
-
-      <div class="generator-intro" aria-labelledby="generator-title">
-        <div>
-          <p class="generator-kicker">CARD / BOOKMARK MAKER</p>
-          <h1 class="generator-title" id="generator-title">今日の断片から、かたちをつくる</h1>
-          <p class="generator-copy">古典・絵画・詩に、好きの気配とタグ、伝統色を静かに重ねます。カードにも、しおりにもできます。</p>
-        </div>
-        <div class="generator-output-actions">
-          <button class="btn btn--primary generator-preview-btn" id="btn-preview-top">カードを生成する</button>
-          <button class="btn btn--primary btn--secondary-primary generator-preview-btn" id="btn-bookmark-top">しおりを生成する</button>
-        </div>
-      </div>
-
-      <!-- Type tabs -->
-      <div class="type-tabs" role="group" aria-label="種別">
-        <button class="type-tab type-tab--active" data-type="all"     aria-pressed="true">すべて</button>
-        <button class="type-tab"                  data-type="classic" aria-pressed="false">古典</button>
-        <button class="type-tab"                  data-type="painting" aria-pressed="false">絵画</button>
-        <button class="type-tab"                  data-type="poem"    aria-pressed="false">詩</button>
-      </div>
-
-      <div class="fragment-actions fragment-actions--top">
-        <button class="btn btn--ghost" id="btn-next">別の断片を見る</button>
-      </div>
-
-      <!-- Fragment card -->
-      <article class="fragment-card" aria-label="文化断片">
-        <span class="badge" id="fragment-badge">古典</span>
-
-        <figure class="fragment-image-wrap" id="fragment-image-wrap" hidden>
-          <img class="fragment-image" id="fragment-image" alt="">
-        </figure>
-
-        <div class="fragment-text" id="fragment-text" lang="ja">
-          <!-- populated by JS -->
-        </div>
-
-        <div class="fragment-meta">
-          <span class="fragment-title"  id="fragment-title"></span>
-          <span class="fragment-author" id="fragment-author"></span>
-        </div>
-
-        <p class="fragment-comment" id="fragment-comment"></p>
-
-        <div class="color-pill">
-          <span class="color-dot" id="color-dot" aria-hidden="true"></span>
-          <span class="color-name" id="color-name"></span>
-        </div>
-      </article>
-
-      <div class="learn-panel" id="learn-panel-generator" aria-live="polite"></div>
-
-      <!-- Kasane controls -->
-      <div class="kasane-controls" aria-label="カード設定">
-
-        <div class="control-block">
-          <p class="control-label" id="tag-label">タグを重ねる</p>
-          <div id="tag-options" class="tag-options" role="group" aria-labelledby="tag-label"></div>
-
-          <label class="control-label control-label--sub" for="custom-tag-input">自分でタグを追加する</label>
-          <p class="control-help">感じたことや思い出した言葉を、自由なタグとして追加できます。#を入れても入れなくても大丈夫です。</p>
-          <input id="custom-tag-input" class="custom-tag-input" type="text"
-            placeholder="例：夜明けの人 / 青い孤独 / 声がきれい"
-            maxlength="24"
-            autocomplete="off">
-        </div>
-
-        <div class="control-block">
-          <p class="control-label" id="color-label">色を添える</p>
-          <div id="color-options" class="color-options" role="group" aria-labelledby="color-label"></div>
-        </div>
-
-        <div class="control-block">
-          <label class="control-label" for="custom-symbol-input">記号を添える</label>
-          <p class="control-help">絵文字や記号を1〜2文字だけ入力できます。空欄のままでも大丈夫です。</p>
-          <input id="custom-symbol-input" class="custom-symbol-input" type="text"
-            placeholder="例：🌙 / 🩵 / 🫧"
-            maxlength="4"
-            autocomplete="off">
-        </div>
-
-      </div>
-
-      <!-- Actions -->
-      <div class="actions generator-output-actions">
-        <button class="btn btn--primary" id="btn-preview">カードを生成する</button>
-        <button class="btn btn--primary btn--secondary-primary" id="btn-bookmark">しおりを生成する</button>
-      </div>
-
-    </section>
-
-    <!-- ─── PREVIEW ─── -->
-    <section id="section-preview" class="section section-preview" aria-label="カードプレビュー">
-
-      <p class="preview-header">カードプレビュー</p>
-
-      <div class="template-selector" role="group" aria-label="カード用途">
-        <button class="template-option template-option--active" data-template="post" aria-pressed="true">投稿用</button>
-        <button class="template-option" data-template="header" aria-pressed="false">ヘッダー</button>
-        <button class="template-option" data-template="icon" aria-pressed="false">アイコン</button>
-      </div>
-
-      <div class="share-card-preview" id="share-card-preview" aria-label="シェアカードプレビュー"></div>
-
-      <div class="learn-panel learn-panel--preview" id="learn-panel-preview" aria-live="polite"></div>
-
-      <div class="preview-actions">
-        <button class="btn btn--primary" id="btn-save-image">画像を保存・共有</button>
-        <button class="btn btn--ghost" id="btn-save-library-card">保管庫に残す</button>
-        <button class="btn btn--ghost" id="btn-generate-bookmark">この断片をしおりにもする</button>
-        <button class="btn btn--ghost" id="btn-back">編集に戻る</button>
-      </div>
-      <p class="library-save-message" id="library-save-message" aria-live="polite"></p>
-      <p class="save-help">スマホでは共有メニューから「画像を保存」を選べます。</p>
-
-      <div class="bookmark-preview-area" id="bookmark-preview-area" hidden>
-        <p class="bookmark-preview-title">しおりプレビュー</p>
-        <div class="bookmark-sheet-preview" id="bookmark-sheet-preview" aria-label="しおりプレビュー"></div>
-        <div class="preview-actions preview-actions--bookmark">
-          <button class="btn btn--primary" id="btn-save-bookmark">しおり画像を保存</button>
-          <button class="btn btn--ghost" id="btn-save-library-bookmark">保管庫に残す</button>
-          <button class="btn btn--ghost" id="btn-back-bookmark">編集に戻る</button>
-        </div>
-        <p class="save-help save-help--bookmark">スマホでは共有メニューから「画像を保存」を選ぶと、しおり画像を保存できます。</p>
-      </div>
-
-    </section>
-
-    <!-- ─── LIBRARY ─── -->
-    <section id="section-library" class="section section-library" aria-labelledby="library-title">
-
-      <p class="section-kicker">LIBRARY</p>
-      <h1 class="library-title" id="library-title">保管庫</h1>
-      <p class="library-copy">重ねた断片を、あとからもう一度ひらく場所です。</p>
-
-      <div class="library-empty" id="library-empty" hidden>
-        まだ保存された断片はありません。カードやしおりを作ったあと、ここに残せます。
-      </div>
-
-      <div class="library-list" id="library-list" aria-live="polite"></div>
-
-    </section>
-
-    <!-- ─── PRESENCE ─── -->
-    <section id="section-presence" class="section section-presence" aria-labelledby="presence-title">
-
-      <p class="section-kicker">PRESENCE</p>
-      <h1 class="presence-title" id="presence-title">気配の設定</h1>
-
-      <div class="presence-intro">
-        <p>よく思い出す名前や言葉を、検索用のタグとして登録できます。</p>
-        <p>登録した気配に近い断片が、少しだけ出やすくなります。</p>
-      </div>
-
-      <div class="presence-panel">
-        <div class="control-block">
-          <label class="control-label" for="presence-name-input">名前や言葉</label>
-          <p class="control-help">例：青い人 / 夜明け / 声がきれい / 月みたいな人</p>
-          <input id="presence-name-input" class="presence-name-input" type="text"
-            placeholder="青い人 / 夜明け / 声がきれい"
-            maxlength="32"
-            autocomplete="off">
-        </div>
-
-        <div class="control-block">
-          <p class="control-label" id="presence-tags-label">関連するタグ</p>
-          <div id="presence-tag-options" class="tag-options" role="group" aria-labelledby="presence-tags-label"></div>
-        </div>
-
-        <label class="presence-toggle" for="presence-enabled-input">
-          <input id="presence-enabled-input" type="checkbox" checked>
-          <span>断片表示に少しだけ反映する</span>
-        </label>
-
-        <div class="presence-actions">
-          <button class="btn btn--primary" id="btn-save-presence">気配を保存する</button>
-          <p class="presence-save-message" id="presence-save-message" aria-live="polite"></p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ─── COLOR FINDER ─── -->
-    <section id="section-color-finder" class="section section-color-finder" aria-labelledby="color-finder-title">
-
-      <p class="section-kicker">COLOR</p>
-      <h1 class="color-finder-title" id="color-finder-title">色から探す</h1>
-
-      <div class="color-finder-intro">
-        <p>好きな色をひとつ選ぶと、その気配に近い伝統色と断片をひらきます。</p>
-        <p>正解を探すものではありません。</p>
-        <p>いま気になる色から、文化の入口をひとつ見つけるための小さな機能です。</p>
-      </div>
-
-      <div class="color-finder-panel">
-        <div class="control-block">
-          <p class="control-label" id="color-finder-options-label">好きな色</p>
-          <div id="color-finder-options" class="color-finder-options" role="group" aria-labelledby="color-finder-options-label"></div>
-        </div>
-
-        <div id="color-finder-result" class="color-finder-result" aria-live="polite"></div>
-      </div>
-
-    </section>
-
-    <!-- ─── ABOUT ─── -->
-    <section id="section-about" class="section section-about" aria-label="このプロダクトについて">
-
-      <p class="about-logo">KASANE</p>
-      <div class="about-rule" aria-hidden="true"></div>
-
-      <div class="about-body">
-        <p>KASANE は、好きの気配を文化の中に見つけるための小さなノートです。</p>
-        <p>古典、絵画、詩に、自分だけの意味を重ねていく。<br>
-           名前を出さなくてもいい。<br>
-           正しく説明できなくてもいい。</p>
-        <p>感じた断片に、タグや色や気配を重ねて、<br>
-           一枚のカードとして残すことができます。</p>
-      </div>
-
-      <p class="about-note">
-        好きは、文化へひらく小さな入口です。<br>
-        古典・絵画・詩・色・言葉の中に、自分だけの響きを見つけていく。<br>
-        KASANEは、その静かな旅のための道具です。
-      </p>
-
-      <div class="about-actions">
-        <button class="btn btn--ghost nav-logo-btn">断片を見る</button>
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- ═══════════════ FOOTER ═══════════════ -->
-  <footer class="site-footer">
-    <button class="footer-link nav-about-btn">このプロダクトについて</button>
-  </footer>
-
-  <!-- Scripts -->
   <script src="contents.js"></script>
   <script src="script.js"></script>
-
 </body>
 </html>
