@@ -46,6 +46,17 @@ const BOOKMARK_EXPORT_WIDTH = 1800;
 const BOOKMARK_EXPORT_HEIGHT = Math.round(BOOKMARK_EXPORT_WIDTH * 127 / 89);
 const BOOKMARK_FILENAME = "kasane-bookmark-lsize.png";
 const BOOKMARK_TAG_LIMIT = 4;
+
+function hexToRgba(hex, alpha) {
+  const value = String(hex || "").replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) return "rgba(212, 201, 188, " + alpha + ")";
+
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+}
+
 const COLOR_FINDER_OPTIONS = [
   {
     id: "sakura",
@@ -266,6 +277,15 @@ function preloadPaintingImages() {
     });
 }
 
+function replayPaintingFloatIn(imageWrap) {
+  if (!imageWrap) return;
+
+  imageWrap.classList.remove("fragment-image-wrap--float-in");
+  requestAnimationFrame(() => {
+    imageWrap.classList.add("fragment-image-wrap--float-in");
+  });
+}
+
 function getLearnFallbackIntro(content) {
   const type = typeLabel(content.type);
   const period = content.period ? content.period + "に位置づけられる" : "";
@@ -393,6 +413,7 @@ function renderFragment(content) {
     imageEl.src = content.imagePath;
     imageEl.alt = "『" + content.title + "』";
     imageWrap.hidden = false;
+    replayPaintingFloatIn(imageWrap);
     fragmentEl.hidden = false;
     fragmentEl.innerHTML = content.fragment
       .split("\n")
@@ -1022,7 +1043,9 @@ function renderLibraryItems() {
   items.forEach(item => {
     const article = document.createElement("article");
     article.className = "library-card";
-    article.style.setProperty("--li", item.color && item.color.hex ? item.color.hex : "var(--accent-soft)");
+    const itemColorHex = item.color && item.color.hex ? item.color.hex : "#D4C9BC";
+    article.style.setProperty("--li", itemColorHex);
+    article.style.setProperty("--li-soft", hexToRgba(itemColorHex, 0.13));
 
     const top = document.createElement("div");
     top.className = "library-card-top";
@@ -1063,6 +1086,15 @@ function renderLibraryItems() {
     const fragment = document.createElement("p");
     fragment.className = "library-fragment";
     fragment.textContent = item.fragment || "";
+
+    let thumb = null;
+    if (item.imagePath) {
+      thumb = document.createElement("img");
+      thumb.className = "library-thumb";
+      thumb.src = item.imagePath;
+      thumb.alt = "『" + (item.title || "") + "』";
+      thumb.loading = "lazy";
+    }
 
     const title = document.createElement("p");
     title.className = "library-work";
@@ -1106,6 +1138,7 @@ function renderLibraryItems() {
 
     article.appendChild(top);
     article.appendChild(colorDot);
+    if (thumb) article.appendChild(thumb);
     article.appendChild(fragment);
     article.appendChild(title);
     article.appendChild(author);

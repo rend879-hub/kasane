@@ -16,6 +16,11 @@
   --accent:       #8C7B6B;
   --accent-soft:  #D4C9BC;
   --accent-current: #FDEFF2;
+  --paper-warm: rgba(253, 252, 249, 0.9);
+  --paper-stain: rgba(140, 123, 107, 0.06);
+  --stone-mist: rgba(168, 188, 178, 0.12);
+  --washi-pink: rgba(253, 239, 242, 0.24);
+  --washi-indigo: rgba(187, 188, 222, 0.14);
   --button-bg: #8C7B6B;
   --button-bg-hover: #7D6D5E;
   --button-text: #FDFCF9;
@@ -408,11 +413,11 @@ body {
 @keyframes painting-float-in {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(10px) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -3457,6 +3462,280 @@ body {
 
   .fragment-card--painting .fragment-image {
     max-height: 286px;
+  }
+}
+
+/* KASANE quiet texture and archive refinements */
+.app-shell {
+  background:
+    linear-gradient(180deg, rgba(253, 252, 249, 0.8), rgba(247, 245, 240, 0.88)),
+    var(--bg);
+  isolation: isolate;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(circle at 18% 12%, var(--washi-pink), transparent 28%),
+    radial-gradient(circle at 82% 18%, var(--stone-mist), transparent 26%),
+    radial-gradient(circle at 30% 82%, var(--washi-indigo), transparent 30%),
+    radial-gradient(circle at 72% 78%, rgba(210, 190, 164, 0.12), transparent 26%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.28), var(--paper-stain));
+  opacity: 0.92;
+}
+
+.app-shell::after {
+  background-image:
+    radial-gradient(rgba(42, 38, 34, 0.1) 0.45px, transparent 0.5px),
+    radial-gradient(rgba(255, 255, 255, 0.5) 0.5px, transparent 0.6px);
+  background-position: 0 0, 9px 11px;
+  background-size: 18px 18px, 23px 23px;
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+}
+
+.app-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.site-header {
+  background:
+    linear-gradient(to bottom, rgba(247, 245, 240, 0.96) 70%, rgba(247, 245, 240, 0));
+  backdrop-filter: blur(8px);
+}
+
+.fragment-card,
+.kasane-sheet,
+.presence-panel,
+.color-finder-panel,
+.learn-details,
+.library-empty,
+.share-card-preview {
+  background:
+    linear-gradient(135deg, rgba(253, 252, 249, 0.9), rgba(247, 245, 240, 0.76));
+}
+
+.fragment-card--painting .fragment-stage {
+  min-height: auto;
+}
+
+.fragment-card--painting .fragment-image-wrap {
+  width: 100%;
+  margin: 0;
+}
+
+.fragment-card--painting .fragment-image {
+  width: 100%;
+  max-height: min(270px, 34vh);
+  object-fit: contain;
+}
+
+.section-generator .fragment-card--painting .fragment-text {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.fragment-card--painting .fragment-side {
+  margin-top: 8px;
+}
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.library-card {
+  min-height: auto;
+  aspect-ratio: auto;
+  overflow: visible;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px 16px;
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(253, 252, 249, 0.94), rgba(247, 245, 240, 0.8)),
+    linear-gradient(90deg, var(--li-soft, rgba(212, 201, 188, 0.13)), transparent 54%);
+  border: 1px solid rgba(224, 221, 215, 0.9);
+  box-shadow: 0 8px 24px rgba(60, 54, 46, 0.06), 0 1px 3px rgba(60, 54, 46, 0.04);
+}
+
+.library-card::before {
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--li, var(--accent-soft));
+}
+
+.library-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.library-labels {
+  gap: 6px;
+}
+
+.library-saved-at,
+.library-meta,
+.library-author {
+  display: flex;
+}
+
+.library-saved-at {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.library-color-dot {
+  right: 14px;
+  bottom: 14px;
+  width: 9px;
+  height: 9px;
+}
+
+.library-thumb {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border: 1px solid rgba(224, 221, 215, 0.8);
+  border-radius: 6px;
+  background: rgba(253, 252, 249, 0.72);
+  margin: 12px 0 10px;
+}
+
+.library-fragment {
+  flex: none;
+  writing-mode: horizontal-tb;
+  max-height: none;
+  overflow: visible;
+  align-self: auto;
+  margin: 12px 0 14px;
+  font-size: 0.92rem;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  white-space: pre-line;
+}
+
+.library-work {
+  min-height: auto;
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.library-author {
+  margin-bottom: 12px;
+}
+
+.library-tags {
+  max-height: none;
+  overflow: visible;
+  margin-bottom: 12px;
+}
+
+.library-meta {
+  gap: 8px 14px;
+  margin-bottom: 16px;
+}
+
+.library-actions {
+  gap: 10px;
+}
+
+.library-actions .btn {
+  width: auto;
+  min-height: 40px;
+  padding: 9px 16px;
+}
+
+.library-delete-btn {
+  align-self: center;
+  padding: 8px 0;
+}
+
+@media (min-width: 700px) {
+  .library-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell::before {
+    opacity: 0.82;
+  }
+
+  .app-shell::after {
+    opacity: 0.14;
+    background-size: 22px 22px, 28px 28px;
+  }
+
+  .fragment-card--painting .fragment-image {
+    max-height: min(250px, 32vh);
+  }
+
+  .section-generator .fragment-card--painting .fragment-text {
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .fragment-card--painting .fragment-side {
+    margin-top: 6px;
+  }
+
+  .library-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .library-card {
+    padding: 17px 16px 15px;
+  }
+
+  .library-card-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .library-saved-at {
+    text-align: left;
+  }
+
+  .library-thumb {
+    max-height: 160px;
+  }
+
+  .library-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .library-actions .btn {
+    width: 100%;
+  }
+
+  .library-delete-btn {
+    align-self: flex-start;
   }
 }
 
