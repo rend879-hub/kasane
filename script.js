@@ -973,7 +973,7 @@ function saveCurrentToLibrary(template) {
 
   const items = [item, ...getStoredLibraryItems()].slice(0, LIBRARY_MAX_ITEMS);
   setStoredLibraryItems(items);
-  setLibrarySaveMessage("保管庫に残しました。あとで見返せます。");
+  setLibrarySaveMessage("ライブラリに残しました。あとで見返せます。");
 
   if (currentSection === "library") {
     renderLibraryItems();
@@ -1815,7 +1815,7 @@ async function savePreviewImage() {
 
   const originalText = saveButton.textContent;
   saveButton.disabled = true;
-  saveButton.textContent = "保存準備中";
+  saveButton.textContent = "書き出し準備中";
 
   try {
     await waitForPreviewImages(card);
@@ -1833,7 +1833,7 @@ async function savePreviewImage() {
     }
   } catch (error) {
     console.error(error);
-    window.alert("画像を保存・共有できませんでした。別のブラウザでお試しください。");
+    window.alert("画像を書き出し・共有できませんでした。別のブラウザでお試しください。");
   } finally {
     saveButton.disabled = false;
     saveButton.textContent = originalText;
@@ -1847,7 +1847,7 @@ async function saveBookmarkImage() {
 
   const originalText = saveButton.textContent;
   saveButton.disabled = true;
-  saveButton.textContent = "保存準備中";
+  saveButton.textContent = "書き出し準備中";
 
   try {
     await waitForPreviewImages(sheet);
@@ -1862,7 +1862,7 @@ async function saveBookmarkImage() {
     }
   } catch (error) {
     console.error(error);
-    window.alert("しおり画像を保存できませんでした。別のブラウザでお試しください。");
+    window.alert("しおり画像を書き出せませんでした。別のブラウザでお試しください。");
   } finally {
     saveButton.disabled = false;
     saveButton.textContent = originalText;
@@ -1924,12 +1924,11 @@ function showSection(name) {
 
   document.querySelectorAll(".bottom-nav-btn").forEach(btn => {
     const target = btn.dataset.nav;
-    const active = target === name || (target === "generator" && name === "color-finder");
-    btn.classList.toggle("active", active);
+    btn.classList.toggle("active", target === name);
   });
 
   document.querySelectorAll(".nav-logo-btn").forEach(btn => {
-    btn.classList.toggle("active", name === "generator" || name === "color-finder");
+    btn.classList.toggle("active", name === "generator");
   });
 
   document.querySelectorAll(".nav-about-btn").forEach(btn => {
@@ -1942,6 +1941,10 @@ function showSection(name) {
 
   document.querySelectorAll(".nav-library-btn").forEach(btn => {
     btn.classList.toggle("active", name === "library");
+  });
+
+  document.querySelectorAll(".nav-color-btn").forEach(btn => {
+    btn.classList.toggle("active", name === "color-finder");
   });
 
   document.querySelectorAll(".nav-color-finder-btn").forEach(btn => {
@@ -2056,6 +2059,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => showSection("library"));
   });
 
+  document.querySelectorAll(".nav-color-btn").forEach(btn => {
+    btn.addEventListener("click", () => showSection("color-finder"));
+  });
+
   document.querySelectorAll(".nav-color-finder-btn").forEach(btn => {
     btn.addEventListener("click", () => showSection("color-finder"));
   });
@@ -2112,7 +2119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // "編集に戻る" → generator
   document.getElementById("btn-back").addEventListener("click", () => showSection("generator"));
 
-  // "画像を保存・共有" → share or download preview card
+  // "画像を書き出す・共有" → share or download preview card
   document.getElementById("btn-save-image").addEventListener("click", savePreviewImage);
   document.getElementById("btn-save-library-card").addEventListener("click", () => {
     saveCurrentToLibrary(selectedTemplate);

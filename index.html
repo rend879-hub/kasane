@@ -21,6 +21,7 @@
     <main class="page-wrap">
       <section id="section-generator" class="section section-generator section--active" aria-label="今日の断片">
         <div class="date-line" id="date-label" aria-live="polite">今日の断片</div>
+        <p class="generator-lead">色とタグを重ねて、古典・絵画・詩から自分だけの一枚を。</p>
 
         <article class="fragment-card" aria-label="文化断片">
           <div class="fragment-stage">
@@ -116,8 +117,8 @@
         <div class="learn-panel learn-panel--preview" id="learn-panel-preview" aria-live="polite"></div>
 
         <div class="preview-actions">
-          <button class="btn btn--primary" id="btn-save-image" type="button">画像を保存・共有</button>
-          <button class="btn btn--ghost" id="btn-save-library-card" type="button">保管庫に残す</button>
+          <button class="btn btn--primary" id="btn-save-image" type="button">画像を書き出す・共有</button>
+          <button class="btn btn--ghost" id="btn-save-library-card" type="button">ライブラリに残す</button>
           <button class="btn btn--ghost" id="btn-generate-bookmark" type="button">この断片をしおりにもする</button>
           <button class="btn btn--ghost" id="btn-back" type="button">編集に戻る</button>
         </div>
@@ -128,8 +129,8 @@
           <p class="bookmark-preview-title">しおりプレビュー</p>
           <div class="bookmark-sheet-preview" id="bookmark-sheet-preview" aria-label="しおりプレビュー"></div>
           <div class="preview-actions preview-actions--bookmark">
-            <button class="btn btn--primary" id="btn-save-bookmark" type="button">しおり画像を保存</button>
-            <button class="btn btn--ghost" id="btn-save-library-bookmark" type="button">保管庫に残す</button>
+            <button class="btn btn--primary" id="btn-save-bookmark" type="button">しおり画像を書き出す</button>
+            <button class="btn btn--ghost" id="btn-save-library-bookmark" type="button">ライブラリに残す</button>
             <button class="btn btn--ghost" id="btn-back-bookmark" type="button">編集に戻る</button>
           </div>
           <p class="save-help save-help--bookmark">L判2枚並べのPNGとして保存できます。</p>
@@ -231,6 +232,9 @@
     <nav class="bottom-nav" aria-label="主要画面">
       <button class="bottom-nav-btn nav-logo-btn active" type="button" data-nav="generator">
         <span class="jp">発見</span><span class="en">DISCOVER</span>
+      </button>
+      <button class="bottom-nav-btn nav-color-btn" type="button" data-nav="color-finder">
+        <span class="jp">色</span><span class="en">COLOR</span>
       </button>
       <button class="bottom-nav-btn nav-library-btn" type="button" data-nav="library">
         <span class="jp">保管庫</span><span class="en">LIBRARY</span>

@@ -195,6 +195,17 @@ body {
   letter-spacing: 0.04em;
 }
 
+.generator-lead {
+  max-width: 30em;
+  margin: -12px 0 24px;
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-mid);
+  letter-spacing: 0.04em;
+}
+
 .generator-preview-btn {
   flex-shrink: 0;
   white-space: nowrap;
@@ -1872,7 +1883,9 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 2px;
   color: var(--ink-light);
 }
 
@@ -1913,6 +1926,21 @@ body {
   flex-wrap: wrap;
   gap: 8px;
   margin: 18px 0 16px;
+}
+
+.library-filter-chips .chip {
+  cursor: default;
+  border-color: transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ink-light);
+  padding: 0 2px 0 0;
+}
+
+.library-filter-chips .chip--active {
+  background: none;
+  border-color: transparent;
+  color: var(--ink-light);
 }
 
 .library-list {
